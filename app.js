@@ -49,7 +49,7 @@
     const url = hasPoster ? (t.poster_path || t.backdrop_path) : null;
     if (url) {
       return `<div class="card-poster" style="background:${posterStyle(t.media_type)}">
-        <img class="poster-img" src="${IMG}w500${esc(url)}" alt="${esc(t.title || t.name)}" loading="lazy" onerror="this.style.display='none'">
+        <img class="poster-img" src="${IMG}w342${esc(url)}" alt="${esc(t.title || t.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'">
       </div>`;
     }
     return `<div class="card-poster" style="background:${posterStyle(t.media_type)}">
@@ -87,10 +87,18 @@
     return list.filter((x) => (x.genre_ids || []).includes(Number(state.genre)));
   }
 
-  async function renderHome() {
+  function renderItems(items) {
+    const list = filterByGenre(items);
+    state.items = list;
+    $("#grid").innerHTML = list.map(cardHTML).join("") || '<p class="empty">Tidak ada hasil.</p>';
+    $("#result-info").textContent = `Menampilkan ${list.length} judul`;
+    $("#empty").hidden = list.length > 0;
+  }
+
+  async function renderHome(trend) {
+    const results = trend.results || [];
     // Hero: trending all
-    const trend = await tmdb("/trending/all/week");
-    const hero = trend.results.find((x) => x.backdrop_path) || trend.results[0];
+    const hero = results.find((x) => x.backdrop_path) || results[0];
     const heroTitle = hero.title || hero.name;
     const heroYear = (hero.release_date || hero.first_air_date || "").slice(0, 4);
     $("#hero-title").textContent = heroTitle;
@@ -101,12 +109,12 @@
       <a class="btn btn-ghost" href="drama.html?id=${hero.id}&media=${hero.media_type}">Detail</a>`;
 
     // Featured editor picks
-    const picks = trend.results.slice(0, 8);
+    const picks = results.slice(0, 8);
     $("#featured").innerHTML = picks.map((t) => cardHTML(Object.assign(t, { media_type: t.media_type || "tv" }))).join("");
-
     wireCarousel($("#featured"), $("#feat-prev"), $("#feat-next"));
 
-    await renderCatalog();
+    // Initial catalog grid reuses the same trending payload (no extra request)
+    renderItems(results.filter((x) => x.media_type === "movie" || x.media_type === "tv"));
   }
 
   function wireCarousel(track, prevBtn, nextBtn) {
@@ -128,32 +136,39 @@
 
   async function renderCatalog(page = 1) {
     $("#grid").innerHTML = '<p class="empty">Memuat...</p>';
-    let items = [];
     try {
       if (state.query) {
         const q = await tmdb("/search/multi", { query: state.query });
-        items = (q.results || []).filter((x) => x.media_type === "movie" || x.media_type === "tv");
+        const items = (q.results || []).filter((x) => x.media_type === "movie" || x.media_type === "tv");
+        renderItems(items);
       } else {
         const d = discoverFor(state.asal);
         const data = d.base ? await tmdb(d.base, d.p) : await tmdb(d);
-        items = (data.results || []).map((x) => Object.assign(x, { media_type: x.media_type || (state.asal === "film" ? "movie" : "tv") }));
+        const items = (data.results || []).map((x) => Object.assign(x, { media_type: x.media_type || (state.asal === "film" ? "movie" : "tv") }));
+        renderItems(items);
       }
-      items = filterByGenre(items);
-      state.items = items;
-      $("#grid").innerHTML = items.map(cardHTML).join("") || '<p class="empty">Tidak ada hasil.</p>';
-      $("#result-info").textContent = `Menampilkan ${items.length} judul`;
-      $("#empty").hidden = items.length > 0;
     } catch (e) {
       $("#grid").innerHTML = '<p class="empty">Gagal memuat: ' + esc(e.message) + "</p>";
     }
   }
 
   async function initHome() {
-    // load genre lists
+    // Fire all initial network requests in parallel for the fastest first paint.
+    let genresTv = {}, genresMv = {}, trend = { results: [] };
     try {
-      const [tv, mv] = await Promise.all([tmdb("/genre/tv/list"), tmdb("/genre/movie/list")]);
+      const settled = await Promise.allSettled([
+        tmdb("/genre/tv/list"),
+        tmdb("/genre/movie/list"),
+        tmdb("/trending/all/week"),
+      ]);
+      if (settled[0].status === "fulfilled") genresTv = settled[0].value;
+      if (settled[1].status === "fulfilled") genresMv = settled[1].value;
+      if (settled[2].status === "fulfilled") trend = settled[2].value;
+    } catch (e) {}
+
+    try {
       const g = {};
-      [...(tv.genres || []), ...(mv.genres || [])].forEach((x) => { g[x.id] = x.name; });
+      [...(genresTv.genres || []), ...(genresMv.genres || [])].forEach((x) => { g[x.id] = x.name; });
       state.genres = g;
       setGenreFilter();
     } catch (e) {}
@@ -182,7 +197,7 @@
     $("#search").addEventListener("input", (e) => { state.query = e.target.value; renderCatalog(); });
     $("#genre-filter").addEventListener("change", (e) => { state.genre = e.target.value; renderCatalog(); });
 
-    await renderHome();
+    await renderHome(trend);
   }
 
   // ---- detail ----
