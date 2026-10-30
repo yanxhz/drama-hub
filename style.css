@@ -59,10 +59,34 @@ body {
 
 /* ---------- rows ---------- */
 .row { margin-top: 32px; }
-.row-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 16px; }
-.hscroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; }
-.hscroll::-webkit-scrollbar { height: 8px; }
-.hscroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.row-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.row-head .row-title { margin-bottom: 0; }
+.row-title { font-size: 1.3rem; font-weight: 800; }
+
+.carousel-controls { display: flex; gap: 8px; flex-shrink: 0; }
+.ctrl-btn {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--border); border-radius: 50%;
+  cursor: pointer; font-size: 1.1rem; font-weight: 700;
+  transition: all .15s; line-height: 1;
+}
+.ctrl-btn:hover { border-color: var(--accent); background: var(--card-hover); }
+.ctrl-btn:disabled { opacity: .35; cursor: default; }
+
+.carousel {
+  display: flex; gap: 14px;
+  overflow-x: auto; padding-bottom: 12px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+.carousel::-webkit-scrollbar { height: 8px; }
+.carousel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.carousel .card { flex: 0 0 auto; width: 200px; scroll-snap-align: start; }
+.carousel .card-poster { height: auto; aspect-ratio: 2 / 3; }
 
 /* ---------- toolbar ---------- */
 .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 14px; }

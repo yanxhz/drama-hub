@@ -32,10 +32,16 @@
   </section>
 
   <main class="container">
-    <!-- FEATURED ROW -->
+    <!-- FEATURED ROW (carousel) -->
     <section class="row" id="featured-row">
-      <h2 class="row-title">✨ Pilihan Editor</h2>
-      <div class="hscroll" id="featured"></div>
+      <div class="row-head">
+        <h2 class="row-title">✨ Pilihan Editor</h2>
+        <div class="carousel-controls">
+          <button type="button" class="ctrl-btn" id="feat-prev" aria-label="Geser ke kiri">&#10094;</button>
+          <button type="button" class="ctrl-btn" id="feat-next" aria-label="Geser ke kanan">&#10095;</button>
+        </div>
+      </div>
+      <div class="carousel" id="featured"></div>
     </section>
 
     <!-- CATALOG -->

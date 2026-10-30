@@ -104,7 +104,26 @@
     const picks = trend.results.slice(0, 8);
     $("#featured").innerHTML = picks.map((t) => cardHTML(Object.assign(t, { media_type: t.media_type || "tv" }))).join("");
 
+    wireCarousel($("#featured"), $("#feat-prev"), $("#feat-next"));
+
     await renderCatalog();
+  }
+
+  function wireCarousel(track, prevBtn, nextBtn) {
+    if (!prevBtn || !nextBtn) return;
+    const step = () => {
+      const card = track.querySelector(".card");
+      return card ? card.getBoundingClientRect().width + 14 : 220;
+    };
+    const update = () => {
+      prevBtn.disabled = track.scrollLeft <= 0;
+      nextBtn.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    };
+    nextBtn.addEventListener("click", () => { track.scrollBy({ left: step(), behavior: "smooth" }); });
+    prevBtn.addEventListener("click", () => { track.scrollBy({ left: -step(), behavior: "smooth" }); });
+    track.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
   }
 
   async function renderCatalog(page = 1) {
