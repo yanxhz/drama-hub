@@ -1,0 +1,11 @@
+# Secret — JANGAN pernah di-push (API key TMDB)
+.dev.vars
+
+# Wrangler / Cloudflare
+.wrangler/
+node_modules/
+
+# Logs & temp
+*.log
+.DS_Store
+Thumbs.db

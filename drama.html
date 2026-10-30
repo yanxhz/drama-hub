@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DramaHub</title>
+  <meta name="description" content="Detail drama, trailer resmi, dan link nonton platform legal.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">🎬 <span>Drama<span class="accent">Hub</span></span></a>
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Beranda</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container detail-page">
+    <p id="detail-error" class="empty" hidden>Drama tidak ditemukan. <a href="index.html">Kembali ke beranda</a></p>
+    <div id="detail" hidden>
+      <div class="detail-hero">
+        <div class="detail-poster" id="detail-poster"></div>
+        <div class="detail-info">
+          <span class="badge" id="detail-badge"></span>
+          <h1 id="detail-title"></h1>
+          <div class="detail-meta" id="detail-meta"></div>
+          <div class="genre-tags" id="detail-genres"></div>
+          <p class="detail-sinopsis" id="detail-sinopsis"></p>
+          <div class="platform-links" id="detail-platforms"></div>
+        </div>
+      </div>
+
+      <section class="row">
+        <h2 class="row-title">▶ Nonton Trailer Resmi</h2>
+        <div class="player-wrap">
+          <div class="player" id="player"></div>
+        </div>
+        <p class="muted">Ini trailer resmi dari YouTube. Untuk nonton episode lengkap, klik platform di atas.</p>
+      </section>
+
+      <section class="row">
+        <h2 class="row-title">🎬 Drama Lainnya</h2>
+        <div class="grid" id="related"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> DramaHub — Direktori streaming drakor &amp; dracin legal.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

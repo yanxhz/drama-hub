@@ -1,0 +1,307 @@
+[
+  {
+    "id": "goblin",
+    "judul": "Goblin",
+    "asal": "drakor",
+    "tahun": 2016,
+    "genre": [
+      "Fantasi",
+      "Romantis",
+      "Komedi"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Gong Yoo, Kim Go-eun, Lee Dong-wook",
+    "sinopsis": "Goblin abadi dan grim reaper hidup bersama dengan seorang mahasiswi yang bisa melihat hantu, dalam kisah cinta melintasi waktu.",
+    "platform": {
+      "Viu": "https://www.viu.com",
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=S94ukM8C17A",
+    "trailerId": "S94ukM8C17A",
+    "poster": "https://media.themoviedb.org/t/p/w500/sPkxHNw5BFvuCFGWw825TS7n6X3.jpg"
+  },
+  {
+    "id": "crash-landing",
+    "judul": "Crash Landing on You",
+    "asal": "drakor",
+    "tahun": 2019,
+    "genre": [
+      "Romantis",
+      "Komedi",
+      "Drama"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Hyun Bin, Son Ye-jin",
+    "sinopsis": "Pewaris chaebol Korea Selatan mendarat darurat di Korea Utara dan jatuh cinta dengan seorang perwira.",
+    "platform": {
+      "Netflix": "https://www.netflix.com",
+      "Viu": "https://www.viu.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=lmypQKAP2Xo",
+    "trailerId": "lmypQKAP2Xo",
+    "poster": "https://media.themoviedb.org/t/p/w500/fgBNLPr6mC8pxuR79ENAJY4nBmj.jpg"
+  },
+  {
+    "id": "squid-game",
+    "judul": "Squid Game",
+    "asal": "drakor",
+    "tahun": 2021,
+    "genre": [
+      "Thriller",
+      "Pertarungan",
+      "Drama"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Lee Jung-jae, Park Hae-soo",
+    "sinopsis": "456 orang yang terlilit utang bermain permainan mematikan demi hadiah besar.",
+    "platform": {
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=oqxAJKy0ii4&pp=ygUjU3F1aWQgR2FtZSBvZmZpY2lhbCB0cmFpbGVyIE5ldGZsaXg%3D",
+    "trailerId": "oqxAJKy0ii4",
+    "poster": "https://media.themoviedb.org/t/p/w500/1QdXdRYfktUSONkl1oD5gc6Be0s.jpg"
+  },
+  {
+    "id": "itaewon",
+    "judul": "Itaewon Class",
+    "asal": "drakor",
+    "tahun": 2020,
+    "genre": [
+      "Drama",
+      "Balas Dendam",
+      "Bisnis"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Park Seo-joon, Kim Da-mi",
+    "sinopsis": "Seorang pemuda membuka bar di Itaewon dan berusaha membalaskan dendam pada konglomerat makanan raksasa.",
+    "platform": {
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=NeaHNQJ1kCo",
+    "trailerId": "NeaHNQJ1kCo",
+    "poster": "https://media.themoviedb.org/t/p/w500/qg7q0piY0fTt2enlIRHwKKRwNjS.jpg"
+  },
+  {
+    "id": "hospital-playlist",
+    "judul": "Hospital Playlist",
+    "asal": "drakor",
+    "tahun": 2020,
+    "genre": [
+      "Drama",
+      "Slice of Life",
+      "Komedi"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Jo Jung-suk, Yoo Yeon-seok, Jung Kyung-ho",
+    "sinopsis": "Lima dokter yang sudah berteman sejak kuliah menjalani kehidupan di rumah sakit sambil membentuk band.",
+    "platform": {
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=ulf9PtJjVjc",
+    "trailerId": "ulf9PtJjVjc",
+    "poster": "https://media.themoviedb.org/t/p/w500/8MSjQkH2FrG0t4l84L5HmiSFrS7.jpg"
+  },
+  {
+    "id": "reply-1988",
+    "judul": "Reply 1988",
+    "asal": "drakor",
+    "tahun": 2015,
+    "genre": [
+      "Slice of Life",
+      "Keluarga",
+      "Komedi"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Lee Hye-ri, Park Bo-gum, Ryu Jun-yeol",
+    "sinopsis": "Kisah hangat tentang persahabatan dan keluarga di sebuah perumahan kecil pada tahun 1988.",
+    "platform": {
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=ZKirVjNDM1w",
+    "trailerId": "ZKirVjNDM1w",
+    "poster": "https://media.themoviedb.org/t/p/w500/655MownSWwplhvVlXERRJ4OSOG2.jpg"
+  },
+  {
+    "id": "vincent",
+    "judul": "Vincenzo",
+    "asal": "drakor",
+    "tahun": 2021,
+    "genre": [
+      "Komedi",
+      "Hukum",
+      "Thriller"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Song Joong-ki, Jeon Yeo-been",
+    "sinopsis": "Seorang pengacara mafia Italia kembali ke Korea dan melawan kejahatan dengan caranya sendiri.",
+    "platform": {
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=_J8tYxYB_YU",
+    "trailerId": "_J8tYxYB_YU",
+    "poster": "https://media.themoviedb.org/t/p/w500/qbkSS1cTjT4DzIwD44bdhTuYgdT.jpg"
+  },
+  {
+    "id": "signal",
+    "judul": "Signal",
+    "asal": "drakor",
+    "tahun": 2016,
+    "genre": [
+      "Thriller",
+      "Kriminal",
+      "Fantasi"
+    ],
+    "negara": "Korea Selatan",
+    "cast": "Lee Je-hoon, Kim Hye-soo, Cho Jin-woong",
+    "sinopsis": "Detektif masa kini dan masa lalu terhubung lewat walkie-talkie misterius untuk memecahkan kasus.",
+    "platform": {
+      "Netflix": "https://www.netflix.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=lcqXfNzoICc",
+    "trailerId": "lcqXfNzoICc",
+    "poster": "https://media.themoviedb.org/t/p/w500/uIskxIo84jexPhnrzm1TpsUCI9w.jpg"
+  },
+  {
+    "id": "the-untamed",
+    "judul": "The Untamed (陈情令)",
+    "asal": "dracin",
+    "tahun": 2019,
+    "genre": [
+      "Fantasi",
+      "Wuxia",
+      "Suspense"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Xiao Zhan, Wang Yibo",
+    "sinopsis": "Dua kultivator muda menyelidiki rangkaian insiden misterius di dunia kultivasi.",
+    "platform": {
+      "WeTV": "https://wetv.vip",
+      "Viu": "https://www.viu.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=eRwV1k-abZo",
+    "trailerId": "eRwV1k-abZo",
+    "poster": "https://media.themoviedb.org/t/p/w500/8TZbpPpLQVS2i7P7yUVhrFlFsmW.jpg"
+  },
+  {
+    "id": "story-of-yanxi",
+    "judul": "Story of Yanxi Palace",
+    "asal": "dracin",
+    "tahun": 2018,
+    "genre": [
+      "Sejarah",
+      "Politik",
+      "Drama"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Wu Jinyan, Qin Lan, Nie Yuan",
+    "sinopsis": "Seorang wanita muda masuk istana untuk mengungkap kematian kakaknya dan naik ke puncak intrik istana.",
+    "platform": {
+      "iQIYI": "https://www.iqiyi.com",
+      "Viu": "https://www.viu.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=Z4xLnxser7s&pp=ygUmU3Rvcnkgb2YgWWFueGkgUGFsYWNlIG9mZmljaWFsIHRyYWlsZXI%3D",
+    "trailerId": "Z4xLnxser7s",
+    "poster": "https://media.themoviedb.org/t/p/w500/k6eVxXSsyK6ukKzdgn9eNCAiLJ0.jpg"
+  },
+  {
+    "id": "as-desired",
+    "judul": "Ashes of Love (香蜜沉沉烬如霜)",
+    "asal": "dracin",
+    "tahun": 2018,
+    "genre": [
+      "Fantasi",
+      "Romantis",
+      "Xianxia"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Yang Zi, Deng Lun",
+    "sinopsis": "Kisah cinta antara putri bunga dan dewa api yang dikutuk.",
+    "platform": {
+      "iQIYI": "https://www.iqiyi.com",
+      "Viu": "https://www.viu.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=-oSUun-c6vU",
+    "trailerId": "-oSUun-c6vU",
+    "poster": "https://media.themoviedb.org/t/p/w500/FdUxxXN0NqS03gxzKgxiWCobue.jpg"
+  },
+  {
+    "id": "go-ahead",
+    "judul": "Go Ahead (以家人之名)",
+    "asal": "dracin",
+    "tahun": 2020,
+    "genre": [
+      "Keluarga",
+      "Drama",
+      "Slice of Life"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Tan Songyun, Song Weilong",
+    "sinopsis": "Tiga anak dari keluarga berbeda tumbuh bersama sebagai saudara kandung non-biologis.",
+    "platform": {
+      "Viu": "https://www.viu.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=sH1A2a8KvGk",
+    "trailerId": "sH1A2a8KvGk",
+    "poster": "https://media.themoviedb.org/t/p/w500/i5Gq1jYAx8aHDbKWKMuLiAJF6FF.jpg"
+  },
+  {
+    "id": "love-o2o",
+    "judul": "Love O2O (微微一笑很倾城)",
+    "asal": "dracin",
+    "tahun": 2016,
+    "genre": [
+      "Romantis",
+      "Kampus",
+      "Komedi"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Yang Yang, Zheng Shuang",
+    "sinopsis": "Ratu game online bertemu dengan pro player terbaik di kampus dan dunia maya.",
+    "platform": {
+      "WeTV": "https://wetv.vip"
+    },
+    "trailer": "https://www.youtube.com/watch?v=tiiN4rDwa8g&pp=ygUvTG92ZSBPMk8g5b6u5b6u5LiA56yR5b6I5YC-5Z-OIG9mZmljaWFsIHRyYWlsZXI%3D",
+    "trailerId": "tiiN4rDwa8g",
+    "poster": "https://media.themoviedb.org/t/p/w500/zqXrBP6CRAX5FkAszdTWWHOb2bY.jpg"
+  },
+  {
+    "id": "ninel",
+    "judul": "The Ninetieth/My Heroic Husband (赘婿)",
+    "asal": "dracin",
+    "tahun": 2021,
+    "genre": [
+      "Komedi",
+      "Bisnis",
+      "Sejarah"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Guo Qilin, Song Yi",
+    "sinopsis": "Pengusaha modern terbangun di masa kuno sebagai menantu yang diremehkan, lalu membangun bisnis besar.",
+    "platform": {
+      "iQIYI": "https://www.iqiyi.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=9Yvau1dHOb8",
+    "trailerId": "9Yvau1dHOb8",
+    "poster": "https://media.themoviedb.org/t/p/w500/aDEQX3EPDO12Rf620184in39A6g.jpg"
+  },
+  {
+    "id": "meet-yourself",
+    "judul": "Meet Yourself (去有风的地方)",
+    "asal": "dracin",
+    "tahun": 2023,
+    "genre": [
+      "Romantis",
+      "Healing",
+      "Slice of Life"
+    ],
+    "negara": "Tiongkok",
+    "cast": "Liu Yifei, Li Xian",
+    "sinopsis": "Seorang wanita pindah ke desa Dali untuk menyembuhkan diri dan menemukan cinta serta makna hidup.",
+    "platform": {
+      "Viu": "https://www.viu.com"
+    },
+    "trailer": "https://www.youtube.com/watch?v=yo8-qjdpqCg",
+    "trailerId": "yo8-qjdpqCg",
+    "poster": "https://media.themoviedb.org/t/p/w500/qIPAvmgFlOYVoKMmMGsiSBsdAgh.jpg"
+  }
+]

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DramaHub — Streaming Drakor & Dracin</title>
+  <meta name="description" content="Streaming-style directory untuk drakor dan dracin. Nonton trailer resmi dan klik ke platform legal.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="app">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">🎬 <span>Drama<span class="accent">Hub</span></span></a>
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link active">Beranda</a>
+        <a href="#filter=drakor" class="nav-link" data-nav="drakor">Drakor</a>
+        <a href="#filter=dracin" class="nav-link" data-nav="dracin">Dracin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <span class="hero-badge">🔥 Trending Minggu Ini</span>
+      <h1 id="hero-title"></h1>
+      <div class="hero-meta" id="hero-meta"></div>
+      <p class="hero-desc" id="hero-desc"></p>
+      <div class="hero-actions" id="hero-actions"></div>
+    </div>
+    <div class="hero-scrim"></div>
+  </section>
+
+  <main class="container">
+    <!-- FEATURED ROW -->
+    <section class="row" id="featured-row">
+      <h2 class="row-title">✨ Pilihan Editor</h2>
+      <div class="hscroll" id="featured"></div>
+    </section>
+
+    <!-- CATALOG -->
+    <section class="row">
+      <div class="row-head">
+        <h2 class="row-title">📺 Semua Drama</h2>
+      </div>
+      <div class="toolbar">
+        <div class="tab-group" id="tab-asal">
+          <button class="tab active" data-asal="all">Semua</button>
+          <button class="tab" data-asal="drakor">Drakor</button>
+          <button class="tab" data-asal="dracin">Dracin</button>
+          <button class="tab" data-asal="film">Film</button>
+        </div>
+        <div class="search-wrap">
+          <input type="search" id="search" placeholder="Cari judul / genre / aktor...">
+        </div>
+        <div class="filter-wrap">
+          <select id="genre-filter" aria-label="Filter genre">
+            <option value="all">Semua Genre</option>
+          </select>
+        </div>
+      </div>
+      <p class="result-info" id="result-info"></p>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden>Tidak ada hasil yang cocok.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> DramaHub — Direktori streaming drakor &amp; dracin legal.</p>
+      <p class="muted">Hanya trailer resmi &amp; link ke platform resmi. Kami tidak menyimpan konten bajakan.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
