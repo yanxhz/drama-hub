@@ -79,6 +79,9 @@
       <div class="carousel-dots" id="new-dots"></div>
     </section>
 
+    <!-- EXTRA ROWS (Sedang Tayang / Akan Datang) -->
+    <div id="home-extra"></div>
+
     <!-- GENRE ROWS (dynamic) -->
     <div id="genre-rows"></div>
 
@@ -97,10 +100,18 @@
         <div class="search-wrap">
           <input type="search" id="search" placeholder="Cari judul / genre / aktor...">
         </div>
+        <div class="filter-wrap">
+          <select id="sort-select" aria-label="Urutkan">
+            <option value="popularity">Popularitas</option>
+            <option value="rating">Rating</option>
+            <option value="year">Terbaru</option>
+          </select>
+        </div>
       </div>
       <div class="genre-chips" id="genre-chips" aria-label="Filter genre"></div>
       <p class="result-info" id="result-info"></p>
       <div class="grid" id="grid"></div>
+      <div class="loadmore-wrap"><button type="button" class="btn btn-ghost btn-sm" id="load-more" hidden>Muat Lebih Banyak</button></div>
       <p class="empty" id="empty" hidden>Tidak ada hasil yang cocok.</p>
     </section>
   </main>

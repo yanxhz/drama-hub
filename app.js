@@ -5,7 +5,7 @@
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
   const IMG = "https://image.tmdb.org/t/p/";
-  const state = { asal: "all", genre: "all", query: "", genres: {}, items: [] };
+  const state = { asal: "all", genre: "all", query: "", genres: {}, items: [], sort: "popularity", page: 1, totalPages: 1, rawItems: [] };
   let heroTimer = null;
 
   // ---- local persistence (favorites + history) ----
@@ -158,8 +158,16 @@
     return list.filter((x) => (x.genre_ids || []).includes(Number(state.genre)));
   }
 
+  function sortList(list) {
+    const s = state.sort || "popularity";
+    const arr = list.slice();
+    if (s === "rating") return arr.sort((a, b) => ((b.vote_average || 0) - (a.vote_average || 0)));
+    if (s === "year") return arr.sort((a, b) => ((b.release_date || b.first_air_date || "").localeCompare(a.release_date || a.first_air_date || "")));
+    return arr;
+  }
+
   function renderItems(items) {
-    const list = filterByGenre(items);
+    const list = sortList(filterByGenre(items));
     state.items = list;
     $("#grid").innerHTML = list.map(cardHTML).join("") || '<p class="empty">Tidak ada hasil.</p>';
     $("#result-info").textContent = `Menampilkan ${list.length} judul`;
@@ -263,7 +271,11 @@
     wireCarousel($("#featured"), $("#feat-prev"), $("#feat-next"), $("#feat-dots"));
 
     // Initial catalog grid reuses the same trending payload (no extra request)
-    renderItems(results.filter((x) => x.media_type === "movie" || x.media_type === "tv"));
+    const initial = results.filter((x) => x.media_type === "movie" || x.media_type === "tv");
+    state.rawItems = initial;
+    state.totalPages = trend.total_pages || 1;
+    renderItems(initial);
+    showLoadMore();
   }
 
   function wireCarousel(track, prevBtn, nextBtn, dotsEl) {
@@ -303,19 +315,38 @@
     setActive();
   }
 
-  async function renderCatalog(page = 1) {
+  function showLoadMore() {
+    const lm = $("#load-more");
+    if (!lm) return;
+    lm.hidden = !(state.totalPages > state.page);
+  }
+
+  async function renderCatalog(reset = true) {
+    if (reset) state.page = 1;
     $("#grid").innerHTML = skeletonHTML(12);
     try {
+      let items = [], total = 1;
       if (state.query) {
-        const q = await tmdb("/search/multi", { query: state.query });
-        const items = (q.results || []).filter((x) => x.media_type === "movie" || x.media_type === "tv");
-        renderItems(items);
+        const q = await tmdb("/search/multi", { query: state.query, page: state.page });
+        items = (q.results || []).filter((x) => x.media_type === "movie" || x.media_type === "tv");
+        total = q.total_pages || 1;
       } else {
         const d = discoverFor(state.asal);
-        const data = d.base ? await tmdb(d.base, d.p) : await tmdb(d);
-        const items = (data.results || []).map((x) => Object.assign(x, { media_type: x.media_type || (state.asal === "film" ? "movie" : "tv") }));
-        renderItems(items);
+        const data = d.base
+          ? await tmdb(d.base, Object.assign({}, d.p, { page: state.page }))
+          : await tmdb(d, { page: state.page });
+        items = (data.results || []).map((x) => Object.assign(x, { media_type: x.media_type || (state.asal === "film" ? "movie" : "tv") }));
+        total = data.total_pages || 1;
       }
+      if (reset) {
+        state.rawItems = items;
+      } else {
+        const seen = new Set(state.rawItems.map((x) => x.id + ":" + x.media_type));
+        state.rawItems = state.rawItems.concat(items.filter((x) => !seen.has(x.id + ":" + x.media_type)));
+      }
+      state.totalPages = total;
+      renderItems(state.rawItems);
+      showLoadMore();
     } catch (e) {
       $("#grid").innerHTML =
         '<p class="empty">Gagal memuat katalog.</p>' +
@@ -329,7 +360,7 @@
     // Prefill catalog with skeleton while data loads.
     $("#grid").innerHTML = skeletonHTML(12);
     // Fire all initial network requests in parallel for the fastest first paint.
-    let genresTv = {}, genresMv = {}, trend = { results: [] }, newMovies = [], newShows = [];
+    let genresTv = {}, genresMv = {}, trend = { results: [] }, newMovies = [], newShows = [], upcomingMovies = [];
     try {
       const settled = await Promise.allSettled([
         tmdb("/genre/tv/list"),
@@ -337,12 +368,14 @@
         tmdb("/trending/all/week"),
         tmdb("/movie/now_playing", { language: "id-ID", region: "ID" }),
         tmdb("/tv/on_the_air", { language: "id-ID" }),
+        tmdb("/movie/upcoming", { language: "id-ID", region: "ID" }),
       ]);
       if (settled[0].status === "fulfilled") genresTv = settled[0].value;
       if (settled[1].status === "fulfilled") genresMv = settled[1].value;
       if (settled[2].status === "fulfilled") trend = settled[2].value;
       if (settled[3].status === "fulfilled") newMovies = (settled[3].value.results || []);
       if (settled[4].status === "fulfilled") newShows = (settled[4].value.results || []);
+      if (settled[5].status === "fulfilled") upcomingMovies = (settled[5].value.results || []);
     } catch (e) {}
 
     try {
@@ -375,8 +408,29 @@
 
     $("#search").addEventListener("input", (e) => { state.query = e.target.value; renderCatalog(); });
 
+    // Sort
+    const sortSel = $("#sort-select");
+    if (sortSel) {
+      sortSel.addEventListener("change", (e) => {
+        state.sort = e.target.value;
+        if (state.rawItems && state.rawItems.length) renderItems(state.rawItems);
+        else renderCatalog();
+      });
+    }
+    // Load more
+    const lm = $("#load-more");
+    if (lm) {
+      lm.addEventListener("click", () => { state.page += 1; renderCatalog(false); });
+    }
+
     await renderHome(trend);
     renderNewRow(newMovies, newShows);
+    // Extra rows: Sedang Tayang / Akan Datang
+    const extraBox = $("#home-extra");
+    if (extraBox) {
+      pushRow(extraBox, "Sedang Tayang", newShows.map((x) => Object.assign({}, x, { media_type: "tv" })).slice(0, 10), "air");
+      pushRow(extraBox, "Akan Datang", upcomingMovies.map((x) => Object.assign({}, x, { media_type: "movie" })).slice(0, 10), "up");
+    }
     buildGenreRows([
       ...trend.results.map((x) => Object.assign({}, x, { media_type: x.media_type || (x.title ? "movie" : "tv") })),
       ...newMovies, ...newShows,
@@ -606,6 +660,28 @@
       };
       refresh();
       favBtn.addEventListener("click", () => { toggleFav(d.id, media, d.title || d.name, d.poster_path || "", year); refresh(); });
+    }
+
+    // share button
+    const shareBtn = $("#detail-share-btn");
+    if (shareBtn) {
+      const shareTitle = d.title || d.name;
+      const shareUrl = location.origin + "/drama.html?id=" + d.id + "&media=" + media;
+      shareBtn.addEventListener("click", async () => {
+        const link = navigator.clipboard ? "ok" : "no";
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: shareTitle, text: shareTitle + " — nonton trailer di DramaHub", url: shareUrl });
+          } else if (navigator.clipboard) {
+            await navigator.clipboard.writeText(shareUrl);
+            showToast("Link disalin");
+          } else {
+            showToast(shareUrl);
+          }
+        } catch (e) {
+          try { if (navigator.clipboard) { await navigator.clipboard.writeText(shareUrl); showToast("Link disalin"); } } catch (_) { showToast("Gagal membagikan"); }
+        }
+      });
     }
 
     await renderStreaming(d, media);
