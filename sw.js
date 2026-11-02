@@ -1,4 +1,4 @@
-var CACHE = "dh-v3";
+var CACHE = "dh-v4";
 var ASSETS = [
   "/",
   "/index.html",
@@ -30,14 +30,15 @@ self.addEventListener("fetch", function (e) {
   var url = new URL(req.url);
   // Don't intercept cross-origin API/image traffic.
   if (url.origin !== location.origin) return;
+  // Network-first: always try fresh; cache is the offline fallback.
   e.respondWith(
-    caches.match(req).then(function (hit) {
-      return hit || fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put(req, copy); });
-        return res;
-      }).catch(function () {
-        return caches.match("/index.html");
+    fetch(req).then(function (res) {
+      var copy = res.clone();
+      caches.open(CACHE).then(function (c) { c.put(req, copy); });
+      return res;
+    }).catch(function () {
+      return caches.match(req).then(function (hit) {
+        return hit || caches.match("/index.html");
       });
     })
   );
