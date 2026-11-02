@@ -208,7 +208,7 @@
       if (key && heroFrame && heroVideo) {
         heroBackdrop.style.backgroundImage = "";
         heroBackdrop.style.display = "none";
-        heroFrame.src = `https://www.youtube.com/embed/${key}?rel=0&autoplay=1&mute=1&loop=1&playlist=${key}&controls=0&disablekb=1`;
+        heroFrame.src = `https://www.youtube.com/embed/${key}?rel=0&autoplay=1&mute=1&loop=1&playlist=${key}&controls=0&disablekb=1&modestbranding=1&iv_load_policy=3`;
         heroVideo.style.display = "block";
       } else {
         heroVideo.style.display = "none";
@@ -582,7 +582,7 @@
     const epSources = vids.slice(0, 4).map((v, i) => ({
       label: v.type === "Teaser" ? "Teaser" : (i === 0 ? "Trailer Resmi" : "Trailer " + (i + 1)),
       kind: "iframe",
-      src: `https://www.youtube.com/embed/${esc(v.key)}?rel=0`,
+      src: `https://www.youtube.com/embed/${esc(v.key)}?rel=0&modestbranding=1&iv_load_policy=3`,
     }));
     if (window.EmbedPlayer) {
       const autoPlay = new URLSearchParams(window.location.search).get("autoplay") === "1";
@@ -890,7 +890,7 @@
       f.tabIndex = -1;
       p.appendChild(f);
     }
-    f.src = `https://www.youtube.com/embed/${hoverTrailers[k]}?rel=0&autoplay=1&mute=1&loop=1&playlist=${hoverTrailers[k]}&controls=0&disablekb=1`;
+    f.src = `https://www.youtube.com/embed/${hoverTrailers[k]}?rel=0&autoplay=1&mute=1&loop=1&playlist=${hoverTrailers[k]}&controls=0&disablekb=1&modestbranding=1&iv_load_policy=3`;
     p.classList.add("has-video");
   });
   document.addEventListener("mouseout", (e) => {
@@ -965,6 +965,23 @@
       });
     }
     setTimeout(showBanner, 1200);
+  }
+
+  // ---- theme toggle (dark/light) ----
+  const themeBtn = document.getElementById("theme-toggle");
+  if (themeBtn) {
+    const KEY = "dh_theme";
+    let mode = "dark";
+    try {
+      mode = localStorage.getItem(KEY) || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    } catch (e) {}
+    const applyTheme = (m) => { document.documentElement.setAttribute("data-theme", m); };
+    applyTheme(mode);
+    themeBtn.addEventListener("click", () => {
+      mode = mode === "dark" ? "light" : "dark";
+      try { localStorage.setItem(KEY, mode); } catch (e) {}
+      applyTheme(mode);
+    });
   }
 
   // ---- boot ----
