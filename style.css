@@ -56,7 +56,8 @@ a { color: inherit; }
 .logo { font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: #fff; text-decoration: none; }
 .logo .accent { color: var(--accent); }
 .main-nav { display: flex; gap: 6px; }
-.nav-link { color: var(--muted); text-decoration: none; font-size: .9rem; padding: 8px 12px; transition: color .15s; }
+.nav-link { color: var(--muted); text-decoration: none; font-size: .9rem; padding: 8px 12px; transition: color .15s; display: inline-flex; align-items: center; }
+.nav-link svg { display: block; }
 .nav-link:hover { color: #fff; }
 .nav-link.active { color: #fff; font-weight: 600; }
 
@@ -456,6 +457,7 @@ a { color: inherit; }
   body { padding-bottom: 64px; }
   .to-top { bottom: 76px; }
   .header-search { display: none; }
+  .main-nav { display: none; }
   .install-banner { left: 16px; right: 16px; bottom: 76px; max-width: none; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .tab-group { order: -1; overflow-x: auto; gap: 18px; }
