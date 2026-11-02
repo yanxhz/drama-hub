@@ -6,6 +6,7 @@
 
   const IMG = "https://image.tmdb.org/t/p/";
   const state = { asal: "all", genre: "all", query: "", genres: {}, items: [] };
+  let heroTimer = null;
 
   // ---- local persistence (favorites + history) ----
   const FAV_KEY = "dh_favs", HIST_KEY = "dh_history";
@@ -150,22 +151,90 @@
     $("#empty").hidden = list.length > 0;
   }
 
+  const heroPlayIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+
   async function renderHome(trend) {
     const results = trend.results || [];
-    // Hero: trending all
-    const hero = results.find((x) => x.backdrop_path) || results[0];
-    if (hero.backdrop_path) {
-      $("#hero-backdrop").style.backgroundImage = `url("${IMG}w1280${esc(hero.backdrop_path)}")`;
+
+    // Hero showcase: top trending items that have art; auto-advances with video.
+    const heroItems = results.filter((x) => x.backdrop_path || x.poster_path).slice(0, 5);
+    const heroDots = $("#hero-dots");
+    const heroVideo = $("#hero-video");
+    const heroFrame = heroVideo ? heroVideo.querySelector("iframe") : null;
+    const heroBackdrop = $("#hero-backdrop");
+
+    let hidx = -1;
+    const trailerCache = {};
+    const tkey = (it) => `${it.media_type}-${it.id}`;
+
+    async function loadTrailer(item) {
+      const k = tkey(item);
+      if (k in trailerCache) return trailerCache[k];
+      try {
+        const v = await tmdb(`/${item.media_type}/${item.id}/videos`, { language: "en-US" });
+        const vid = (v.results || []).find((x) => x.site === "YouTube" && (x.type === "Trailer" || x.type === "Teaser"));
+        trailerCache[k] = vid ? vid.key : null;
+      } catch (e) { trailerCache[k] = null; }
+      return trailerCache[k];
     }
-    const heroTitle = hero.title || hero.name;
-    const heroYear = (hero.release_date || hero.first_air_date || "").slice(0, 4);
-    $("#hero-title").textContent = heroTitle;
-    $("#hero-meta").innerHTML = `${heroYear} · ${esc(hero.media_type === "movie" ? "Film" : "Drama (TV)")}`;
-    $("#hero-desc").textContent = hero.overview || "";
-    const playIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
-    $("#hero-actions").innerHTML = `
-      <a class="btn btn-primary" href="drama.html?id=${hero.id}&media=${hero.media_type}&autoplay=1">${playIcon}<span>Nonton Trailer</span></a>
-      <a class="btn btn-ghost" href="drama.html?id=${hero.id}&media=${hero.media_type}">Detail</a>`;
+
+    function refreshHeroMedia() {
+      const item = heroItems[hidx];
+      if (!item) return;
+      const key = trailerCache[tkey(item)];
+      if (key && heroFrame && heroVideo) {
+        heroBackdrop.style.backgroundImage = "";
+        heroBackdrop.style.display = "none";
+        heroFrame.src = `https://www.youtube.com/embed/${key}?rel=0&autoplay=1&mute=1&loop=1&playlist=${key}&controls=0&disablekb=1`;
+        heroVideo.style.display = "block";
+      } else {
+        heroVideo.style.display = "none";
+        if (heroFrame) heroFrame.src = "about:blank";
+        const img = item.backdrop_path || item.poster_path;
+        if (img) {
+          heroBackdrop.style.backgroundImage = `url("${IMG}w1280${esc(img)}")`;
+          heroBackdrop.style.display = "block";
+        }
+      }
+    }
+
+    function setHero(i) {
+      hidx = ((i % heroItems.length) + heroItems.length) % heroItems.length;
+      const item = heroItems[hidx];
+      const title = item.title || item.name;
+      const yr = (item.release_date || item.first_air_date || "").slice(0, 4);
+      $("#hero-title").textContent = title;
+      $("#hero-meta").innerHTML = `${yr} · ${esc(item.media_type === "movie" ? "Film" : "Drama (TV)")}`;
+      $("#hero-desc").textContent = item.overview || "";
+      $("#hero-actions").innerHTML =
+        `<a class="btn btn-primary" href="drama.html?id=${item.id}&media=${item.media_type}&autoplay=1">${heroPlayIcon}<span>Nonton Trailer</span></a>` +
+        `<a class="btn btn-ghost" href="drama.html?id=${item.id}&media=${item.media_type}">Detail</a>`;
+      refreshHeroMedia();
+      if (heroDots) {
+        Array.from(heroDots.children).forEach((d, di) => d.classList.toggle("active", di === hidx));
+      }
+    }
+
+    // Build hero indicator dots.
+    if (heroDots && heroItems.length > 1) {
+      heroDots.innerHTML = "";
+      heroItems.forEach((_, i) => {
+        const d = document.createElement("button");
+        d.type = "button"; d.className = "dot";
+        d.setAttribute("aria-label", "Geser ke item " + (i + 1));
+        d.addEventListener("click", () => setHero(i));
+        heroDots.appendChild(d);
+      });
+    } else if (heroDots) { heroDots.hidden = true; }
+
+    // Start with the first hero item, prefetch trailers, auto-advance.
+    if (heroItems.length) {
+      setHero(0);
+      heroItems.forEach((item) => loadTrailer(item).then(() => { if (hidx >= 0 && heroItems[hidx] === item) refreshHeroMedia(); }));
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        heroTimer = setInterval(() => setHero(hidx + 1), 8000);
+      }
+    }
 
     // Featured editor picks
     const picks = results.slice(0, 8);
@@ -594,5 +663,20 @@
       onScroll();
       tt.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
     }
+
+    // Pause/resume hero auto-advance when the tab is hidden.
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+      } else if (!heroTimer && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        heroTimer = setInterval(() => {
+          const dots = $("#hero-dots");
+          if (!dots || !dots.children.length) return;
+          const active = Array.from(dots.children).findIndex((d) => d.classList.contains("active"));
+          const next = (active + 1) % dots.children.length;
+          dots.children[next].click();
+        }, 8000);
+      }
+    });
   })();
 })();
