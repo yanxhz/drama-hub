@@ -249,6 +249,9 @@ a { color: inherit; }
 .genre-tag { font-size: .78rem; background: var(--raised); color: var(--muted); padding: 4px 12px; border-radius: 999px; flex: 0 0 auto; white-space: nowrap; }
 
 .platform-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.prov-group { margin-top: 14px; }
+.prov-group-title { font-size: .85rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+.prov-group + .prov-group { margin-top: 18px; }
 .platform-link {
   text-decoration: none; font-size: .82rem; font-weight: 500;
   color: var(--text); padding: 8px 14px; border-radius: var(--radius-control);

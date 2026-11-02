@@ -514,20 +514,22 @@
     setMeta("og:description", (d.overview || "").slice(0, 160));
     if (d.poster_path) setMeta("og:image", `${IMG}w500${esc(d.poster_path)}`);
 
-    // trailer (fallback to en-US request videos are often English-only)
-    let vid = ((d.videos && d.videos.results) || []).find((v) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"));
-    if (!vid) {
+    // Trailers: collect ALL official YouTube trailers/teasers (multi-tab).
+    let vids = ((d.videos && d.videos.results) || []).filter((v) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"));
+    if (!vids.length) {
       try {
         const vres = await tmdb(`/${media}/${id}/videos`, { language: "en-US" });
-        vid = (vres.results || []).find((v) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"));
+        vids = (vres.results || []).filter((v) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"));
       } catch (e) {}
     }
-    // player: EmbedPlayer (ala IDLIX) — trailer sebagai sumber default, bisa ditambah via window.DRAMAHUB_SOURCES
+    const vid = vids[0] || null;
+    // player: EmbedPlayer — semua trailer resmi jadi tab sumber, bisa ditambah via window.DRAMAHUB_SOURCES
     const playerEl = $("#player");
-    const epSources = [];
-    if (vid) {
-      epSources.push({ label: "Trailer Resmi", kind: "iframe", src: `https://www.youtube.com/embed/${esc(vid.key)}?rel=0` });
-    }
+    const epSources = vids.slice(0, 4).map((v, i) => ({
+      label: v.type === "Teaser" ? "Teaser" : (i === 0 ? "Trailer Resmi" : "Trailer " + (i + 1)),
+      kind: "iframe",
+      src: `https://www.youtube.com/embed/${esc(v.key)}?rel=0`,
+    }));
     if (window.EmbedPlayer) {
       const autoPlay = new URLSearchParams(window.location.search).get("autoplay") === "1";
       new window.EmbedPlayer(playerEl, {
@@ -552,21 +554,22 @@
       }
     }
 
-    // watch providers (legal links)
+    // watch providers (legal links), grouped by access: Langganan vs Sewa/Beli
     let provHTML = "";
     try {
       const wp = await tmdb(`/${media}/${id}/watch/providers`);
       const pr = (wp.results && (wp.results["ID"] || wp.results["US"])) || null;
-      if (pr && (pr.flatrate || pr.rent || pr.buy)) {
-        const list = pr.flatrate || pr.rent || pr.buy;
-        provHTML = '<div class="platform-links">' + list.slice(0, 5).map((p) => {
-          const name = esc(p.provider_name);
-          const icon = p.logo_path ? `<img class="prov-logo" src="${IMG}w92${esc(p.logo_path)}" alt="${name}">` : "";
-          return `<a class="platform-link prov-link" href="https://www.themoviedb.org/${media}/${id}/watch" target="_blank" rel="noopener noreferrer">${icon}<span>${name}</span></a>`;
-        }).join("") + '</div>';
-      } else {
-        provHTML = '<p class="muted">Info platform nonton tidak tersedia di TMDB.</p>';
-      }
+      const provLink = (p) => {
+        const name = esc(p.provider_name);
+        const icon = p.logo_path ? `<img class="prov-logo" src="${IMG}w92${esc(p.logo_path)}" alt="${name}">` : "";
+        return `<a class="platform-link prov-link" href="https://www.themoviedb.org/${media}/${id}/watch" target="_blank" rel="noopener noreferrer">${icon}<span>${name}</span></a>`;
+      };
+      const block = (title, list) =>
+        list && list.length
+          ? `<div class="prov-group"><h4 class="prov-group-title">${title}</h4><div class="platform-links">${list.slice(0, 6).map(provLink).join("")}</div></div>`
+          : "";
+      const html = block("Langganan (Subskripsi)", pr && pr.flatrate) + block("Sewa / Beli", pr && (pr.rent || pr.buy));
+      provHTML = html || '<p class="muted">Info platform nonton tidak tersedia di TMDB.</p>';
     } catch (e) {
       provHTML = '<p class="muted">Info platform nonton tidak tersedia.</p>';
     }
