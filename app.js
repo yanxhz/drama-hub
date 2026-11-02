@@ -562,7 +562,7 @@
       if (src) bd.style.backgroundImage = `url("${IMG}w780${esc(src)}")`;
     }
 
-    document.title = (d.title || d.name) + " — DramaHub";
+    document.title = (d.title || d.name) + " — Draviel";
     pushHistory(d, media);
     setMeta("og:title", d.title || d.name);
     setMeta("og:description", (d.overview || "").slice(0, 160));
@@ -671,7 +671,7 @@
         const link = navigator.clipboard ? "ok" : "no";
         try {
           if (navigator.share) {
-            await navigator.share({ title: shareTitle, text: shareTitle + " — nonton trailer di DramaHub", url: shareUrl });
+            await navigator.share({ title: shareTitle, text: shareTitle + " — nonton trailer di Draviel", url: shareUrl });
           } else if (navigator.clipboard) {
             await navigator.clipboard.writeText(shareUrl);
             showToast("Link disalin");

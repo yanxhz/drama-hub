@@ -1,4 +1,4 @@
-/* DramaHub EmbedPlayer — iframe/video embed player dengan multi-server (ala IDLIX).
+/* Draviel EmbedPlayer — iframe/video embed player dengan multi-server (ala IDLIX).
  * Framework, tanpa deps. Sumber konten ditentukan oleh pemilik situs:
  *  - sumber default: trailer resmi (dari TMDB/YouTube)
  *  - tambahan: window.DRAMAHUB_SOURCES[media][id] = [{label, kind:'iframe'|'video', src, poster}]

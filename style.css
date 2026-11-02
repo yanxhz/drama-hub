@@ -71,6 +71,7 @@ a { color: inherit; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
 .header-actions { display: flex; align-items: center; gap: 8px; }
 .logo { font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
+.logo img { height: 34px; width: auto; display: block; }
 .logo .accent { color: var(--accent); }
 .main-nav { display: flex; gap: 6px; }
 .nav-link { color: var(--muted); text-decoration: none; font-size: .9rem; padding: 8px 12px; transition: color .15s; display: inline-flex; align-items: center; }
