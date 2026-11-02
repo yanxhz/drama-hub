@@ -504,8 +504,10 @@ html[data-theme="light"] .ic-moon { display: block; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
   .card-body { padding: 12px 12px 4px; }
   .card-meta { padding: 0 12px 12px; }
-  .detail-hero { padding: 28px 0 32px; }
+  .detail-hero { padding: 26px 6px 36px; }
   .detail-hero-content { flex-direction: column; gap: 22px; }
-  .detail-poster { flex-basis: auto; width: 100%; max-height: 340px; }
+  .detail-backdrop { inset: -30px -16px; filter: blur(18px) saturate(1.1) brightness(0.75); }
+  .detail-poster { flex-basis: auto; width: 100%; max-width: 220px; max-height: 330px; margin: 0 auto; }
+  .detail-sinopsis { font-size: .95rem; line-height: 1.6; }
   .row { margin-top: 32px; }
 }
