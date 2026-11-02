@@ -6,11 +6,14 @@
   <title>DramaHub</title>
   <meta name="description" content="Detail drama, trailer resmi, dan link nonton platform legal.">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">🎬 <span>Drama<span class="accent">Hub</span></span></a>
+      <a href="index.html" class="logo"><span>Drama<span class="accent">Hub</span></span></a>
       <nav class="main-nav">
         <a href="index.html" class="nav-link">Beranda</a>
       </nav>
@@ -33,15 +36,21 @@
       </div>
 
       <section class="row">
-        <h2 class="row-title">▶ Nonton Trailer Resmi</h2>
+        <h2 class="row-title">Streaming &amp; Nonton</h2>
+        <p class="muted">Trailer resmi dari YouTube. Untuk menonton episode lengkap, pilih season &amp; episode lalu buka platform di atas.</p>
         <div class="player-wrap">
           <div class="player" id="player"></div>
         </div>
-        <p class="muted">Ini trailer resmi dari YouTube. Untuk nonton episode lengkap, klik platform di atas.</p>
+
+        <div id="episodes-section" hidden>
+          <h3 class="sub-title">Episode (Serial)</h3>
+          <div class="season-tabs" id="season-tabs"></div>
+          <div class="grid ep-grid" id="episodes"></div>
+        </div>
       </section>
 
       <section class="row">
-        <h2 class="row-title">🎬 Drama Lainnya</h2>
+        <h2 class="row-title">Drama Lainnya</h2>
         <div class="grid" id="related"></div>
       </section>
     </div>
@@ -53,6 +62,7 @@
     </div>
   </footer>
 
+  <script src="player.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

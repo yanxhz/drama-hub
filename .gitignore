@@ -5,6 +5,9 @@
 .wrangler/
 node_modules/
 
+# taste-skill artifacts (screenshots, reports)
+.taste-skill/
+
 # Logs & temp
 *.log
 .DS_Store

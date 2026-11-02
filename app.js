@@ -39,9 +39,7 @@
 
   // ---- rendering ----
   function posterStyle(media) {
-    return media === "movie"
-      ? "linear-gradient(150deg,#1a1030 0%,#3b1f5e 55%,#6b2d8f 100%)"
-      : "linear-gradient(150deg,#06202a 0%,#0c4a5e 55%,#0e6f8a 100%)";
+    return media === "movie" ? "#1d1b20" : "#1a1b20";
   }
 
   function itemPosterHTML(t) {
@@ -104,8 +102,9 @@
     $("#hero-title").textContent = heroTitle;
     $("#hero-meta").innerHTML = `${heroYear} · ${esc(hero.media_type === "movie" ? "Film" : "Drama (TV)")}`;
     $("#hero-desc").textContent = hero.overview || "";
+    const playIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
     $("#hero-actions").innerHTML = `
-      <a class="btn btn-primary" href="drama.html?id=${hero.id}&media=${hero.media_type}">▶ Nonton Trailer</a>
+      <a class="btn btn-primary" href="drama.html?id=${hero.id}&media=${hero.media_type}">${playIcon}<span>Nonton Trailer</span></a>
       <a class="btn btn-ghost" href="drama.html?id=${hero.id}&media=${hero.media_type}">Detail</a>`;
 
     // Featured editor picks
@@ -204,7 +203,7 @@
   async function initDetail() {
     const id = new URLSearchParams(window.location.search).get("id");
     const media = new URLSearchParams(window.location.search).get("media") === "movie" ? "movie" : "tv";
-    const d = await tmdb(`/${media}/${id}`, { append_to_response: "videos,credits,recommendations" });
+    const d = await tmdb(`/${media}/${id}`, { append_to_response: "videos,credits,recommendations,seasons" });
 
     $("#detail-badge").innerHTML = badgeHTML(media);
     $("#detail-title").textContent = d.title || d.name;
@@ -232,10 +231,23 @@
         vid = (vres.results || []).find((v) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"));
       } catch (e) {}
     }
+    // player: EmbedPlayer (ala IDLIX) — trailer sebagai sumber default, bisa ditambah via window.DRAMAHUB_SOURCES
+    const playerEl = $("#player");
+    const epSources = [];
     if (vid) {
-      $("#player").innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${esc(vid.key)}?rel=0" title="Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+      epSources.push({ label: "Trailer Resmi", kind: "iframe", src: `https://www.youtube-nocookie.com/embed/${esc(vid.key)}?rel=0` });
+    }
+    if (window.EmbedPlayer) {
+      new window.EmbedPlayer(playerEl, {
+        title: d.title || d.name,
+        poster: d.poster_path ? `${IMG}w500${esc(d.poster_path)}` : "",
+        sources: epSources,
+        autoPlay: false,
+      });
+    } else if (vid) {
+      playerEl.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${esc(vid.key)}?rel=0" title="Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
     } else {
-      $("#player").innerHTML = '<p class="empty">Trailer tidak tersedia.</p>';
+      playerEl.innerHTML = '<p class="empty">Trailer tidak tersedia.</p>';
     }
 
     // watch providers (legal links)
@@ -262,7 +274,69 @@
     const rel = (d.recommendations && d.recommendations.results || []).slice(0, 6).map((x) => Object.assign(x, { media_type: media }));
     $("#related").innerHTML = rel.map(cardHTML).join("") || '<p class="empty">Tidak ada rekomendasi.</p>';
 
+    await renderStreaming(d, media);
+
     $("#detail").hidden = false;
+  }
+
+  // ---- streaming section: episodes (legal, from TMDB) ----
+  async function renderStreaming(d, media) {
+    const sec = $("#episodes-section");
+    if (media !== "tv" || !d) {
+      sec.hidden = true;
+      return;
+    }
+    const seasons = (d.seasons || []).filter((s) => s.season_number > 0);
+    if (!seasons.length) {
+      sec.hidden = true;
+      return;
+    }
+    sec.hidden = false;
+
+    const tabs = $("#season-tabs");
+    tabs.innerHTML = seasons.map((s, i) =>
+      `<button type="button" class="tab${i === 0 ? " active" : ""}" data-season="${s.season_number}">Season ${s.season_number}</button>`
+    ).join("");
+
+    const loadSeason = async (seasonNumber) => {
+      const grid = $("#episodes");
+      grid.innerHTML = '<p class="empty">Memuat episode...</p>';
+      try {
+        const se = await tmdb(`/${media}/${d.id}/season/${seasonNumber}`, { language: "id-ID" });
+        const eps = se.episodes || [];
+        if (!eps.length) {
+          grid.innerHTML = '<p class="empty">Belum ada episode.</p>';
+          return;
+        }
+        grid.innerHTML = eps.map((ep) => {
+          const still = ep.still_path ? `${IMG}w300${esc(ep.still_path)}` : null;
+          const date = (ep.air_date || "").slice(0, 10);
+          const href = `https://www.themoviedb.org/${media}/${d.id}/season/${seasonNumber}/episode/${ep.episode_number}`;
+          return `<a class="ep-card" href="${href}" target="_blank" rel="noopener noreferrer">
+            ${still
+              ? `<div class="ep-thumb" style="background-image:url('${still}')"></div>`
+              : `<div class="ep-thumb ep-thumb-empty">E${ep.episode_number}</div>`}
+            <div class="ep-body">
+              <span class="ep-num">E${ep.episode_number}</span>
+              <strong>${esc(ep.name || "Episode " + ep.episode_number)}</strong>
+              <span class="muted">${esc(date || "—")}</span>
+            </div>
+          </a>`;
+        }).join("");
+      } catch (e) {
+        grid.innerHTML = '<p class="empty">Gagal memuat episode.</p>';
+      }
+    };
+
+    tabs.querySelectorAll(".tab").forEach((t) => {
+      t.addEventListener("click", () => {
+        tabs.querySelectorAll(".tab").forEach((x) => x.classList.remove("active"));
+        t.classList.add("active");
+        loadSeason(Number(t.dataset.season));
+      });
+    });
+
+    await loadSeason(seasons[0].season_number);
   }
 
   // ---- boot ----

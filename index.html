@@ -6,12 +6,15 @@
   <title>DramaHub — Streaming Drakor & Dracin</title>
   <meta name="description" content="Streaming-style directory untuk drakor dan dracin. Nonton trailer resmi dan klik ke platform legal.">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://image.tmdb.org">
 </head>
-<body class="app">
+<body>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="logo">🎬 <span>Drama<span class="accent">Hub</span></span></a>
+      <a href="index.html" class="logo"><span>Drama<span class="accent">Hub</span></span></a>
       <nav class="main-nav">
         <a href="index.html" class="nav-link active">Beranda</a>
       </nav>
@@ -19,25 +22,23 @@
   </header>
 
   <!-- HERO -->
-  <section class="hero" id="hero">
+  <section class="hero">
     <div class="container">
-      <span class="hero-badge">🔥 Trending Minggu Ini</span>
       <h1 id="hero-title"></h1>
       <div class="hero-meta" id="hero-meta"></div>
       <p class="hero-desc" id="hero-desc"></p>
       <div class="hero-actions" id="hero-actions"></div>
     </div>
-    <div class="hero-scrim"></div>
   </section>
 
   <main class="container">
     <!-- FEATURED ROW (carousel) -->
     <section class="row" id="featured-row">
       <div class="row-head">
-        <h2 class="row-title">✨ Pilihan Editor</h2>
+        <h2 class="row-title">Pilihan Editor</h2>
         <div class="carousel-controls">
-          <button type="button" class="ctrl-btn" id="feat-prev" aria-label="Geser ke kiri">&#10094;</button>
-          <button type="button" class="ctrl-btn" id="feat-next" aria-label="Geser ke kanan">&#10095;</button>
+          <button type="button" class="ctrl-btn" id="feat-prev" aria-label="Geser ke kiri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button type="button" class="ctrl-btn" id="feat-next" aria-label="Geser ke kanan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
         </div>
       </div>
       <div class="carousel" id="featured"></div>
@@ -46,7 +47,7 @@
     <!-- CATALOG -->
     <section class="row">
       <div class="row-head">
-        <h2 class="row-title">📺 Semua Drama</h2>
+        <h2 class="row-title">Semua Drama</h2>
       </div>
       <div class="toolbar">
         <div class="tab-group" id="tab-asal">
