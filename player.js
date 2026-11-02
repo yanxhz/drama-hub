@@ -182,6 +182,8 @@
         f.setAttribute("scrolling", "no");
         f.addEventListener("load", () => { this.loadingEl.hidden = true; });
         this.mediaEl.appendChild(f);
+        // iframe render itself fast; hide loading immediately so it never covers the video
+        this.loadingEl.hidden = true;
       } else {
         const v = document.createElement("video");
         v.className = "ep-video";
