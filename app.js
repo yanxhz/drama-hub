@@ -856,35 +856,39 @@
     });
   }
 
-  // ---- install / download app (PWA) ----
+  // ---- install / download app (PWA): auto notification banner ----
   let deferredPrompt = null;
-  const installBtn = document.getElementById("install-btn");
-  if (installBtn) {
-    const isStandalone = window.matchMedia && matchMedia("(display-mode: standalone)").matches;
-    if (isStandalone) {
-      installBtn.hidden = true;
-    } else {
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-      });
-      installBtn.addEventListener("click", async () => {
+  const ibEl = document.getElementById("install-banner");
+  const isStandalone = window.matchMedia && matchMedia("(display-mode: standalone)").matches;
+  if (ibEl && !isStandalone) {
+    const DKEY = "dh_install_dismissed";
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(DKEY) === String(new Date().getDate()); } catch (e) {}
+    const ibBtn = ibEl.querySelector(".ib-btn");
+    const ibClose = ibEl.querySelector(".ib-close");
+    const showBanner = () => { if (!dismissed) ibEl.hidden = false; };
+    const hideBanner = () => { ibEl.hidden = true; };
+    window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; });
+    if (ibBtn) {
+      ibBtn.addEventListener("click", async () => {
         try {
           if (deferredPrompt) {
-            const p = deferredPrompt;
-            deferredPrompt = null;
-            p.prompt();
-            await p.userChoice;
-            const span = installBtn.querySelector("span");
-            if (span) span.textContent = "Terpasang";
+            const p = deferredPrompt; deferredPrompt = null;
+            p.prompt(); await p.userChoice; hideBanner();
           } else {
+            hideBanner();
             showToast("Install: buka menu browser lalu pilih 'Tambahkan ke Layar Utama'.");
           }
-        } catch (e) {
-          showToast("Install: buka menu browser lalu pilih 'Tambahkan ke Layar Utama'.");
-        }
+        } catch (e) { hideBanner(); showToast("Install: buka menu browser lalu pilih 'Tambahkan ke Layar Utama'."); }
       });
     }
+    if (ibClose) {
+      ibClose.addEventListener("click", () => {
+        dismissed = true; hideBanner();
+        try { localStorage.setItem(DKEY, String(new Date().getDate())); } catch (e) {}
+      });
+    }
+    setTimeout(showBanner, 1200);
   }
 
   // ---- boot ----

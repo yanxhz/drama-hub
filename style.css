@@ -421,6 +421,23 @@ a { color: inherit; }
 .search-big:focus { border-color: #fff; }
 .search-page .genre-chips { margin-top: 20px; }
 
+/* ---------- install banner (auto notification) ---------- */
+.install-banner {
+  position: fixed; right: 20px; bottom: 24px; z-index: 69;
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 12px 14px; max-width: 360px;
+}
+.install-banner[hidden] { display: none; }
+.ib-icon { color: var(--accent); flex-shrink: 0; }
+.ib-body { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.ib-body strong { font-size: .95rem; }
+.ib-body span { font-size: .8rem; color: var(--muted); }
+.ib-btn { flex-shrink: 0; }
+.ib-close { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 6px; display: flex; flex-shrink: 0; }
+.ib-close:hover { color: #fff; }
+.ib-close svg { display: block; }
+
 /* ---------- back-to-top ---------- */
 .to-top {
   position: fixed; right: 20px; bottom: 20px; z-index: 60;
@@ -439,6 +456,7 @@ a { color: inherit; }
   body { padding-bottom: 64px; }
   .to-top { bottom: 76px; }
   .header-search { display: none; }
+  .install-banner { left: 16px; right: 16px; bottom: 76px; max-width: none; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .tab-group { order: -1; overflow-x: auto; gap: 18px; }
   .search-wrap { min-width: 0; }
