@@ -78,9 +78,23 @@
   }
 
   function setGenreFilter() {
-    const opts = Object.entries(state.genres).sort((a, b) => a[1].localeCompare(b[1]));
-    $("#genre-filter").innerHTML = '<option value="all">Semua Genre</option>' +
-      opts.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
+    const box = $("#genre-chips");
+    if (!box) return;
+    const list = [["all", "Semua"], ...Object.entries(state.genres).sort((a, b) => a[1].localeCompare(b[1]))];
+    box.innerHTML = "";
+    list.forEach(([id, name]) => {
+      const c = document.createElement("button");
+      c.type = "button";
+      c.className = "chip" + (id === "all" ? " active" : "");
+      c.dataset.genre = id;
+      c.textContent = name;
+      c.addEventListener("click", () => {
+        state.genre = id;
+        box.querySelectorAll(".chip").forEach((x) => x.classList.toggle("active", x === c));
+        renderCatalog();
+      });
+      box.appendChild(c);
+    });
   }
 
   function filterByGenre(list) {
@@ -228,7 +242,6 @@
     });
 
     $("#search").addEventListener("input", (e) => { state.query = e.target.value; renderCatalog(); });
-    $("#genre-filter").addEventListener("change", (e) => { state.genre = e.target.value; renderCatalog(); });
 
     await renderHome(trend);
     renderNewRow(newMovies, newShows);
