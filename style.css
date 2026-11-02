@@ -51,7 +51,8 @@ a { color: inherit; }
   background: var(--ground);
   border-bottom: 1px solid var(--rule);
 }
-.header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
 .logo { font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: #fff; text-decoration: none; }
 .logo .accent { color: var(--accent); }
 .main-nav { display: flex; gap: 6px; }
@@ -115,6 +116,7 @@ a { color: inherit; }
 .btn-ghost { background: transparent; color: var(--text); border-color: var(--control); }
 .btn-ghost:hover { border-color: #fff; }
 .btn-sm { padding: 8px 18px; font-size: .85rem; }
+#install-btn[hidden] { display: none !important; }
 .trailer-ext { text-align: center; margin-top: 14px; }
 
 /* ---------- rows ---------- */
@@ -436,6 +438,7 @@ a { color: inherit; }
   .container { padding: 0 20px; }
   body { padding-bottom: 64px; }
   .to-top { bottom: 76px; }
+  .header-search { display: none; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .tab-group { order: -1; overflow-x: auto; gap: 18px; }
   .search-wrap { min-width: 0; }

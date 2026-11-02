@@ -856,6 +856,37 @@
     });
   }
 
+  // ---- install / download app (PWA) ----
+  let deferredPrompt = null;
+  const installBtn = document.getElementById("install-btn");
+  if (installBtn) {
+    const isStandalone = window.matchMedia && matchMedia("(display-mode: standalone)").matches;
+    if (isStandalone) {
+      installBtn.hidden = true;
+    } else {
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+      });
+      installBtn.addEventListener("click", async () => {
+        try {
+          if (deferredPrompt) {
+            const p = deferredPrompt;
+            deferredPrompt = null;
+            p.prompt();
+            await p.userChoice;
+            const span = installBtn.querySelector("span");
+            if (span) span.textContent = "Terpasang";
+          } else {
+            showToast("Install: buka menu browser lalu pilih 'Tambahkan ke Layar Utama'.");
+          }
+        } catch (e) {
+          showToast("Install: buka menu browser lalu pilih 'Tambahkan ke Layar Utama'.");
+        }
+      });
+    }
+  }
+
   // ---- boot ----
   (async () => {
     $("#year").textContent = new Date().getFullYear();
