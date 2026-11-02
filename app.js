@@ -17,9 +17,21 @@
   function toggleFav(id, media, title, poster, year) {
     const favs = getFavs();
     const i = favs.findIndex((f) => f.id === id && f.media === media);
-    if (i >= 0) favs.splice(i, 1); else favs.unshift({ id, media, title, poster, year });
+    let removed = false;
+    if (i >= 0) { favs.splice(i, 1); removed = true; }
+    else favs.unshift({ id, media, title, poster, year });
     saveList(FAV_KEY, favs);
     renderPersonalRows();
+    showToast(removed ? "Dihapus dari Favorit" : "Tersimpan di Favorit");
+  }
+  let _toastTimer = null;
+  function showToast(msg) {
+    const t = $("#toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.hidden = false;
+    if (_toastTimer) clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => { t.hidden = true; }, 1800);
   }
   function pushHistory(d, media) {
     const h = loadList(HIST_KEY).filter((x) => !(x.id === d.id && x.media === media));
@@ -108,7 +120,7 @@
     const title = t.title || t.name;
     const year = (t.release_date || t.first_air_date || "").slice(0, 4);
     const href = `drama.html?id=${t.id}&media=${t.media_type}`;
-    return `<a class="card" href="${href}">
+    return `<a class="card" href="${href}" data-id="${t.id}" data-media="${esc(t.media_type)}">
       ${itemPosterHTML(t)}
       <div class="card-body">
         <h3>${esc(title)}</h3>
@@ -203,16 +215,22 @@
       const item = heroItems[hidx];
       const title = item.title || item.name;
       const yr = (item.release_date || item.first_air_date || "").slice(0, 4);
-      $("#hero-title").textContent = title;
-      $("#hero-meta").innerHTML = `${yr} · ${esc(item.media_type === "movie" ? "Film" : "Drama (TV)")}`;
-      $("#hero-desc").textContent = item.overview || "";
-      $("#hero-actions").innerHTML =
-        `<a class="btn btn-primary" href="drama.html?id=${item.id}&media=${item.media_type}&autoplay=1">${heroPlayIcon}<span>Nonton Trailer</span></a>` +
-        `<a class="btn btn-ghost" href="drama.html?id=${item.id}&media=${item.media_type}">Detail</a>`;
-      refreshHeroMedia();
-      if (heroDots) {
-        Array.from(heroDots.children).forEach((d, di) => d.classList.toggle("active", di === hidx));
-      }
+      const heroEl = $("#hero");
+      // Crossfade: fade out, swap content, fade back in.
+      if (heroEl) heroEl.classList.add("is-switching");
+      setTimeout(() => {
+        $("#hero-title").textContent = title;
+        $("#hero-meta").innerHTML = `${yr} · ${esc(item.media_type === "movie" ? "Film" : "Drama (TV)")}`;
+        $("#hero-desc").textContent = item.overview || "";
+        $("#hero-actions").innerHTML =
+          `<a class="btn btn-primary" href="drama.html?id=${item.id}&media=${item.media_type}&autoplay=1">${heroPlayIcon}<span>Nonton Trailer</span></a>` +
+          `<a class="btn btn-ghost" href="drama.html?id=${item.id}&media=${item.media_type}">Detail</a>`;
+        refreshHeroMedia();
+        if (heroDots) {
+          Array.from(heroDots.children).forEach((d, di) => d.classList.toggle("active", di === hidx));
+        }
+        if (heroEl) heroEl.classList.remove("is-switching");
+      }, 300);
     }
 
     // Build hero indicator dots.
@@ -417,6 +435,11 @@
     box.innerHTML = "";
     const hist = loadList(HIST_KEY).map((h) => ({ id: h.id, media_type: h.media, title: h.title, poster_path: h.poster || null, release_date: h.year, genre_ids: [] }));
     const favs = getFavs().map((f) => ({ id: f.id, media_type: f.media, title: f.title, poster_path: f.poster || null, release_date: f.year, genre_ids: [] }));
+    if (!hist.length && !favs.length) {
+      box.innerHTML = '<div class="personal-empty"><p>Belum ada aktivitas — simpan drama ke Favorit dan langsung nonton trailer biar muncul di sini.</p></div>';
+      box.hidden = false;
+      return;
+    }
     pushRow(box, "Lanjut Nonton", hist, "hist");
     pushRow(box, "Favoritku", favs, "fav");
     box.hidden = !box.children.length;
@@ -645,6 +668,69 @@
     toggleFav(Number(id), media, title, poster, year);
     b.classList.toggle("on", isFav(Number(id), media));
   });
+
+  // ---- hover trailer preview on cards ----
+  const hoverTrailers = {};
+  document.addEventListener("mouseover", async (e) => {
+    const card = e.target.closest(".card[data-id]");
+    if (!card || card.dataset.hovering) return;
+    card.dataset.hovering = "1";
+    const id = Number(card.dataset.id), media = card.dataset.media;
+    const k = `${media}-${id}`;
+    if (!(k in hoverTrailers)) {
+      try {
+        const v = await tmdb(`/${media}/${id}/videos`, { language: "en-US" });
+        const vid = (v.results || []).find((x) => x.site === "YouTube" && (x.type === "Trailer" || x.type === "Teaser"));
+        hoverTrailers[k] = vid ? vid.key : false;
+      } catch (e) { hoverTrailers[k] = false; }
+    }
+    if (!hoverTrailers[k]) { delete card.dataset.hovering; return; }
+    const p = card.querySelector(".card-poster");
+    if (!p) { delete card.dataset.hovering; return; }
+    let f = p.querySelector(".poster-video");
+    if (!f) {
+      f = document.createElement("iframe");
+      f.className = "poster-video";
+      f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+      f.setAttribute("frameborder", "0");
+      f.tabIndex = -1;
+      p.appendChild(f);
+    }
+    f.src = `https://www.youtube.com/embed/${hoverTrailers[k]}?rel=0&autoplay=1&mute=1&loop=1&playlist=${hoverTrailers[k]}&controls=0&disablekb=1`;
+    p.classList.add("has-video");
+  });
+  document.addEventListener("mouseout", (e) => {
+    const card = e.target.closest(".card[data-id]");
+    if (!card) return;
+    const rel = e.relatedTarget;
+    if (rel && card.contains(rel)) return;
+    const p = card.querySelector(".card-poster");
+    const f = p && p.querySelector(".poster-video");
+    if (f) f.src = "about:blank";
+    if (p) p.classList.remove("has-video");
+    delete card.dataset.hovering;
+  });
+
+  // ---- bottom nav (mobile) ----
+  const bottomNav = $("#bottom-nav");
+  if (bottomNav) {
+    bottomNav.querySelectorAll(".bn-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const kind = btn.dataset.bn;
+        if (kind === "home") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (kind === "search") {
+          const s = $("#search");
+          if (s) { s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
+          else window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (kind === "fav") {
+          const pr = $("#personal-rows");
+          const target = (pr && pr.children.length) ? pr : $("#grid");
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+  }
 
   // ---- boot ----
   (async () => {
