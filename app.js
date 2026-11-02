@@ -119,6 +119,9 @@
   function cardHTML(t) {
     const title = t.title || t.name;
     const year = (t.release_date || t.first_air_date || "").slice(0, 4);
+    const metaDate = t.release_date || t.first_air_date || "";
+    const isNew = metaDate ? (Date.now() - new Date(metaDate).getTime()) < 90 * 864e5 : false;
+    const rating = t.vote_average ? `${t.vote_average.toFixed(1)}/10` : "";
     const href = `drama.html?id=${t.id}&media=${t.media_type}`;
     return `<a class="card" href="${href}" data-id="${t.id}" data-media="${esc(t.media_type)}">
       ${itemPosterHTML(t)}
@@ -126,7 +129,7 @@
         <h3>${esc(title)}</h3>
         <div class="genre-tags">${(t.genre_ids || []).slice(0, 3).map((g) => `<span class="genre-tag">${esc(state.genres[g] || "?")}</span>`).join("")}</div>
       </div>
-      <div class="card-meta"><span class="card-year">${year}</span>${badgeHTML(t.media_type)}</div>
+      <div class="card-meta">${isNew ? '<span class="badge badge-new">Baru</span>' : ""}<span class="card-year">${year}</span>${rating ? `<span class="card-rating">${rating}</span>` : ""}${badgeHTML(t.media_type)}</div>
     </a>`;
   }
 
@@ -659,6 +662,110 @@
     await loadSeason(seasons[0].season_number);
   }
 
+  // ---- search page ----
+  async function initSearch() {
+    $("#year").textContent = new Date().getFullYear();
+    let genresTv = {}, genresMv = {}, trend = { results: [] }, newMovies = [], newShows = [];
+    try {
+      const settled = await Promise.allSettled([
+        tmdb("/genre/tv/list"), tmdb("/genre/movie/list"),
+        tmdb("/trending/all/week"),
+        tmdb("/movie/now_playing", { region: "ID" }), tmdb("/tv/on_the_air"),
+      ]);
+      if (settled[0].status === "fulfilled") genresTv = settled[0].value;
+      if (settled[1].status === "fulfilled") genresMv = settled[1].value;
+      if (settled[2].status === "fulfilled") trend = settled[2].value;
+      if (settled[3].status === "fulfilled") newMovies = settled[3].value.results || [];
+      if (settled[4].status === "fulfilled") newShows = settled[4].value.results || [];
+    } catch (e) {}
+
+    state.genres = {};
+    [...(genresTv.genres || []), ...(genresMv.genres || [])].forEach((x) => { state.genres[x.id] = x.name; });
+    state.genre = "all";
+
+    const chipBox = $("#cari-genres");
+    if (chipBox) {
+      const list = [["all", "Semua"], ...Object.entries(state.genres).sort((a, b) => a[1].localeCompare(b[1]))];
+      chipBox.innerHTML = "";
+      list.forEach(([id, name]) => {
+        const c = document.createElement("button");
+        c.type = "button"; c.className = "chip" + (id === "all" ? " active" : "");
+        c.dataset.genre = id; c.textContent = name;
+        c.addEventListener("click", async () => {
+          state.genre = id;
+          chipBox.querySelectorAll(".chip").forEach((x) => x.classList.toggle("active", x === c));
+          searchGrid();
+        });
+        chipBox.appendChild(c);
+      });
+    }
+
+    const suggestBox = $("#cari-suggest");
+    const grid = $("#search-grid");
+    const info = $("#search-info");
+    const empty = $("#search-empty");
+
+    function showGrid() { suggestBox.hidden = true; grid.hidden = false; info.hidden = false; empty.hidden = true; }
+    function showSuggest() { suggestBox.hidden = false; grid.hidden = true; info.hidden = true; empty.hidden = true; }
+
+    async function renderSuggest() {
+      showSuggest();
+      suggestBox.innerHTML = "";
+      const all = [
+        ...trend.results.map((x) => Object.assign({}, x, { media_type: x.media_type || (x.title ? "movie" : "tv") })),
+        ...newMovies.map((x) => Object.assign({}, x, { media_type: "movie" })),
+        ...newShows.map((x) => Object.assign({}, x, { media_type: "tv" })),
+      ];
+      if (state.genre !== "all") {
+        const filtered = all.filter((t) => (t.genre_ids || []).includes(Number(state.genre)));
+        pushRow(suggestBox, state.genres[state.genre] || "Genre", filtered.slice(0, 10), "sug");
+        return;
+      }
+      pushRow(suggestBox, "Sedang Trending", all.slice(0, 10), "sug");
+      const nb = [
+        ...newMovies.map((x) => Object.assign({}, x, { media_type: "movie" })),
+        ...newShows.map((x) => Object.assign({}, x, { media_type: "tv" })),
+      ].slice(0, 10);
+      pushRow(suggestBox, "Baru Rilis", nb, "sug2");
+    }
+
+    async function searchGrid() {
+      const q = $("#search-big").value.trim();
+      showGrid();
+      if (state.genre !== "all") {
+        grid.innerHTML = skeletonHTML(12);
+        try {
+          const [mv, tv] = await Promise.allSettled([
+            tmdb("/discover/movie", { with_genres: state.genre, sort_by: "popularity.desc" }),
+            tmdb("/discover/tv", { with_genres: state.genre, sort_by: "popularity.desc" }),
+          ]);
+          let items = [];
+          if (mv.status === "fulfilled") items = items.concat(mv.value.results.map((x) => Object.assign({}, x, { media_type: "movie" })));
+          if (tv.status === "fulfilled") items = items.concat(tv.value.results.map((x) => Object.assign({}, x, { media_type: "tv" })));
+          items.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
+          grid.innerHTML = items.slice(0, 20).map(cardHTML).join("");
+          info.textContent = `Menampilkan ${items.length} judul genre ${state.genres[state.genre]}`;
+          empty.hidden = items.length > 0;
+        } catch (e) { grid.innerHTML = '<p class="empty">Gagal memuat.</p>'; }
+        return;
+      }
+      if (!q) { await renderSuggest(); return; }
+      grid.innerHTML = skeletonHTML(12);
+      info.textContent = "";
+      try {
+        const r = await tmdb("/search/multi", { query: q });
+        const items = (r.results || []).filter((x) => x.media_type === "movie" || x.media_type === "tv");
+        grid.innerHTML = items.map(cardHTML).join("");
+        info.textContent = `Menampilkan ${items.length} hasil untuk "${q}"`;
+        empty.hidden = items.length > 0;
+      } catch (e) { grid.innerHTML = '<p class="empty">Gagal mencari.</p>'; }
+    }
+
+    function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+    $("#search-big").addEventListener("input", debounce(() => searchGrid(), 300));
+    await renderSuggest();
+  }
+
   // ---- delegated clicks: favorite buttons ----
   document.addEventListener("click", (e) => {
     const b = e.target.closest(".fav-btn");
@@ -737,6 +844,8 @@
     $("#year").textContent = new Date().getFullYear();
     if (location.pathname.includes("drama.html") || location.search.includes("id=")) {
       await initDetail();
+    } else if (location.pathname.includes("cari")) {
+      await initSearch();
     } else {
       await initHome();
     }
@@ -748,6 +857,11 @@
       window.addEventListener("scroll", onScroll, { passive: true });
       onScroll();
       tt.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    }
+
+    // PWA: register service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
 
     // Pause/resume hero auto-advance when the tab is hidden.

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cari — DramaHub</title>
+  <meta name="description" content="Cari drakor, dracin, dan film di DramaHub. Jelajahi berdasarkan judul, aktor, atau genre.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DramaHub">
+  <meta property="og:title" id="og-title" content="Cari — DramaHub">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://image.tmdb.org">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span>Drama<span class="accent">Hub</span></span></a>
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Beranda</a>
+        <a href="cari.html" class="nav-link active">Cari</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container detail-page search-page">
+    <section class="search-hero">
+      <h1 class="search-title">Cari</h1>
+      <div class="search-big-wrap">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="search-big" class="search-big" placeholder="Judul, aktor, atau genre..." autocomplete="off" aria-label="Cari judul, aktor, atau genre">
+      </div>
+      <div class="genre-chips" id="cari-genres" aria-label="Filter genre"></div>
+    </section>
+
+    <div id="cari-suggest"></div>
+
+    <p class="result-info" id="search-info" hidden></p>
+    <div class="grid" id="search-grid"></div>
+    <p class="empty" id="search-empty" hidden>Tidak ada hasil untuk pencarian itu.</p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> DramaHub — Direktori streaming drakor &amp; dracin legal.</p>
+      <p class="muted">Hanya trailer resmi &amp; link ke platform resmi. Kami tidak menyimpan konten bajakan.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <button type="button" id="to-top" class="to-top" aria-label="Kembali ke atas" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
