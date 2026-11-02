@@ -200,8 +200,12 @@ a { color: inherit; }
 .card-poster-fallback { position: relative; z-index: 1; font-size: 1rem; font-weight: 600; color: var(--text); display: none; }
 .card-poster-title { font-size: .95rem; font-weight: 600; color: var(--text); }
 .card-poster .badge { position: absolute; top: 10px; left: 10px; }
-.card-body { padding: 14px 14px 6px; display: flex; flex-direction: column; gap: 9px; }
-.card-body h3 { font-size: 1rem; font-weight: 600; line-height: 1.3; }
+.card-body { padding: 14px 14px 8px; display: flex; flex-direction: column; gap: 8px; }
+.card-body h3 {
+  font-size: .98rem; font-weight: 600; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; min-height: 2.6em;
+}
 .card-meta { padding: 0 14px 14px; display: flex; align-items: center; gap: 10px; }
 
 /* ---------- badges / chips (neutral, sentence case) ---------- */
@@ -209,8 +213,9 @@ a { color: inherit; }
 .badge-drakor, .badge-dracin { background: var(--raised); color: var(--muted); }
 .card-year { color: var(--muted); font-size: .85rem; }
 
-.genre-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.genre-tag { font-size: .78rem; background: var(--raised); color: var(--muted); padding: 4px 12px; border-radius: 999px; }
+.genre-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.card .genre-tags { flex-wrap: nowrap; overflow: hidden; }
+.genre-tag { font-size: .78rem; background: var(--raised); color: var(--muted); padding: 4px 12px; border-radius: 999px; flex: 0 0 auto; white-space: nowrap; }
 
 .platform-links { display: flex; flex-wrap: wrap; gap: 8px; }
 .platform-link {
