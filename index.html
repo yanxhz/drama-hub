@@ -6,6 +6,11 @@
   <title>DramaHub — Streaming Drakor & Dracin</title>
   <meta name="description" content="Streaming-style directory untuk drakor dan dracin. Nonton trailer resmi dan klik ke platform legal.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DramaHub">
+  <meta property="og:title" id="og-title" content="DramaHub — Streaming Drakor & Dracin">
+  <meta property="og:description" id="og-desc" content="Direktori streaming drakor & dracin legal — trailer resmi + link ke platform.">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,6 +55,9 @@
       <div class="carousel" id="featured"></div>
       <div class="carousel-dots" id="feat-dots"></div>
     </section>
+
+    <!-- PERSONAL ROWS (favorites + history, dynamic) -->
+    <div id="personal-rows"></div>
 
     <!-- NEW RELEASES ROW -->
     <section class="row" id="newrow-section">
@@ -98,5 +106,6 @@
   </footer>
 
   <script src="app.js"></script>
+  <button type="button" id="to-top" class="to-top" aria-label="Kembali ke atas" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
 </body>
 </html>

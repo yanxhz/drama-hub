@@ -6,6 +6,11 @@
   <title>DramaHub</title>
   <meta name="description" content="Detail drama, trailer resmi, dan link nonton platform legal.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="video.other">
+  <meta property="og:site_name" content="DramaHub">
+  <meta property="og:title" id="og-title" content="DramaHub">
+  <meta property="og:description" id="og-desc" content="">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +35,10 @@
         <div class="detail-hero-content">
           <div class="detail-poster" id="detail-poster"></div>
           <div class="detail-info">
-            <span class="badge" id="detail-badge"></span>
+            <div class="detail-info-top">
+              <span class="badge" id="detail-badge"></span>
+              <button type="button" class="btn btn-ghost btn-sm" id="detail-fav-btn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9A5.4 5.4 0 0 1 12 6a5.4 5.4 0 0 1 9.5 6C19 16.4 12 21 12 21z"/></svg><span>Simpan</span></button>
+            </div>
             <h1 id="detail-title"></h1>
             <div class="detail-meta" id="detail-meta"></div>
             <div class="genre-tags" id="detail-genres"></div>
@@ -39,6 +47,11 @@
           </div>
         </div>
       </div>
+
+      <section class="row" id="cast-section">
+        <h2 class="row-title">Pemain</h2>
+        <div class="cast-grid" id="detail-cast"></div>
+      </section>
 
       <section class="row">
         <h2 class="row-title">Streaming &amp; Nonton</h2>
@@ -72,5 +85,6 @@
 
   <script src="player.js"></script>
   <script src="app.js"></script>
+  <button type="button" id="to-top" class="to-top" aria-label="Kembali ke atas" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
 </body>
 </html>
