@@ -97,6 +97,9 @@
     const results = trend.results || [];
     // Hero: trending all
     const hero = results.find((x) => x.backdrop_path) || results[0];
+    if (hero.backdrop_path) {
+      $("#hero-backdrop").style.backgroundImage = `url("${IMG}w1280${esc(hero.backdrop_path)}")`;
+    }
     const heroTitle = hero.title || hero.name;
     const heroYear = (hero.release_date || hero.first_air_date || "").slice(0, 4);
     $("#hero-title").textContent = heroTitle;
@@ -104,33 +107,53 @@
     $("#hero-desc").textContent = hero.overview || "";
     const playIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
     $("#hero-actions").innerHTML = `
-      <a class="btn btn-primary" href="drama.html?id=${hero.id}&media=${hero.media_type}">${playIcon}<span>Nonton Trailer</span></a>
+      <a class="btn btn-primary" href="drama.html?id=${hero.id}&media=${hero.media_type}&autoplay=1">${playIcon}<span>Nonton Trailer</span></a>
       <a class="btn btn-ghost" href="drama.html?id=${hero.id}&media=${hero.media_type}">Detail</a>`;
 
     // Featured editor picks
     const picks = results.slice(0, 8);
     $("#featured").innerHTML = picks.map((t) => cardHTML(Object.assign(t, { media_type: t.media_type || "tv" }))).join("");
-    wireCarousel($("#featured"), $("#feat-prev"), $("#feat-next"));
+    wireCarousel($("#featured"), $("#feat-prev"), $("#feat-next"), $("#feat-dots"));
 
     // Initial catalog grid reuses the same trending payload (no extra request)
     renderItems(results.filter((x) => x.media_type === "movie" || x.media_type === "tv"));
   }
 
-  function wireCarousel(track, prevBtn, nextBtn) {
+  function wireCarousel(track, prevBtn, nextBtn, dotsEl) {
     if (!prevBtn || !nextBtn) return;
     const step = () => {
       const card = track.querySelector(".card");
-      return card ? card.getBoundingClientRect().width + 14 : 220;
+      return card ? card.getBoundingClientRect().width + 18 : 180;
     };
-    const update = () => {
+    const dots = [];
+    const cards = track.querySelectorAll(".card");
+    if (dotsEl) {
+      if (cards.length > 1) {
+        cards.forEach((_, i) => {
+          const d = document.createElement("button");
+          d.type = "button";
+          d.className = "dot";
+          d.setAttribute("aria-label", "Geser ke item " + (i + 1));
+          d.addEventListener("click", () => { track.scrollTo(i * step(), 0); setActive(); });
+          dotsEl.appendChild(d);
+          dots.push(d);
+        });
+      } else {
+        dotsEl.hidden = true;
+      }
+    }
+    const setActive = () => {
+      const w = step();
+      const idx = track.scrollLeft <= 0 ? 0 : Math.min(dots.length - 1, Math.round(track.scrollLeft / w));
       prevBtn.disabled = track.scrollLeft <= 0;
       nextBtn.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      dots.forEach((d, i) => d.classList.toggle("active", i === idx));
     };
-    nextBtn.addEventListener("click", () => { track.scrollBy({ left: step(), behavior: "smooth" }); });
-    prevBtn.addEventListener("click", () => { track.scrollBy({ left: -step(), behavior: "smooth" }); });
-    track.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    update();
+    nextBtn.addEventListener("click", () => { track.scrollBy(step(), 0); setActive(); });
+    prevBtn.addEventListener("click", () => { track.scrollBy(-step(), 0); setActive(); });
+    track.addEventListener("scroll", setActive, { passive: true });
+    window.addEventListener("resize", setActive);
+    setActive();
   }
 
   async function renderCatalog(page = 1) {
@@ -235,19 +258,30 @@
     const playerEl = $("#player");
     const epSources = [];
     if (vid) {
-      epSources.push({ label: "Trailer Resmi", kind: "iframe", src: `https://www.youtube-nocookie.com/embed/${esc(vid.key)}?rel=0` });
+      epSources.push({ label: "Trailer Resmi", kind: "iframe", src: `https://www.youtube.com/embed/${esc(vid.key)}?rel=0` });
     }
     if (window.EmbedPlayer) {
+      const autoPlay = new URLSearchParams(window.location.search).get("autoplay") === "1";
       new window.EmbedPlayer(playerEl, {
         title: d.title || d.name,
         poster: d.poster_path ? `${IMG}w500${esc(d.poster_path)}` : "",
         sources: epSources,
-        autoPlay: false,
+        autoPlay: autoPlay,
       });
     } else if (vid) {
-      playerEl.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${esc(vid.key)}?rel=0" title="Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+      playerEl.innerHTML = `<iframe src="https://www.youtube.com/embed/${esc(vid.key)}?rel=0" title="Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
     } else {
       playerEl.innerHTML = '<p class="empty">Trailer tidak tersedia.</p>';
+    }
+
+    // Escape hatch: kalau embed diblokir browser, tetap bisa nonton via link resmi.
+    if (vid) {
+      const ext = $("#trailer-ext");
+      if (ext) {
+        const a = ext.querySelector("a");
+        if (a) a.href = `https://www.youtube.com/watch?v=${esc(vid.key)}`;
+        ext.hidden = false;
+      }
     }
 
     // watch providers (legal links)

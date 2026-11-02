@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://image.tmdb.org">
 </head>
 <body>
@@ -21,13 +21,18 @@
     </div>
   </header>
 
-  <!-- HERO -->
+  <!-- HERO (cinematic: full-bleed backdrop, scrim to black, bottom-left content) -->
   <section class="hero">
+    <div class="hero-media" id="hero-backdrop"></div>
+    <div class="hero-tint"></div>
+    <div class="hero-scrim"></div>
     <div class="container">
-      <h1 id="hero-title"></h1>
-      <div class="hero-meta" id="hero-meta"></div>
-      <p class="hero-desc" id="hero-desc"></p>
-      <div class="hero-actions" id="hero-actions"></div>
+      <div class="hero-content">
+        <h1 id="hero-title"></h1>
+        <div class="hero-meta" id="hero-meta"></div>
+        <p class="hero-desc" id="hero-desc"></p>
+        <div class="hero-actions" id="hero-actions"></div>
+      </div>
     </div>
   </section>
 
@@ -42,6 +47,7 @@
         </div>
       </div>
       <div class="carousel" id="featured"></div>
+      <div class="carousel-dots" id="feat-dots"></div>
     </section>
 
     <!-- CATALOG -->
