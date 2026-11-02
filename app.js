@@ -382,6 +382,14 @@
       ...newMovies, ...newShows,
     ]);
     renderPersonalRows();
+    // Deep-link dari bottom nav "Favorit" → scroll ke baris favorit.
+    if (new URLSearchParams(location.search).get("fav") === "1") {
+      setTimeout(() => {
+        const pr = $("#personal-rows");
+        const t = (pr && pr.children.length) ? pr : $("#grid");
+        if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 350);
+    }
   }
 
   function buildGenreRows(allItems) {
@@ -821,19 +829,25 @@
   // ---- bottom nav (mobile) ----
   const bottomNav = $("#bottom-nav");
   if (bottomNav) {
+    const isHomePage = location.pathname === "/" || location.pathname.endsWith("index.html") || location.pathname === "";
+    const scrollToFav = () => {
+      const pr = $("#personal-rows");
+      const t = (pr && pr.children.length) ? pr : $("#grid");
+      if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
     bottomNav.querySelectorAll(".bn-item").forEach((btn) => {
+      btn.type = "button";
       btn.addEventListener("click", () => {
         const kind = btn.dataset.bn;
         if (kind === "home") {
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          if (isHomePage) window.scrollTo({ top: 0, behavior: "smooth" });
+          else location.href = "/";
         } else if (kind === "search") {
-          const s = $("#search");
-          if (s) { s.focus(); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
-          else window.scrollTo({ top: 0, behavior: "smooth" });
+          if (location.pathname.includes("cari")) window.scrollTo({ top: 0, behavior: "smooth" });
+          else location.href = "/cari";
         } else if (kind === "fav") {
-          const pr = $("#personal-rows");
-          const target = (pr && pr.children.length) ? pr : $("#grid");
-          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+          if (isHomePage) scrollToFav();
+          else location.href = "/?fav=1";
         }
       });
     });

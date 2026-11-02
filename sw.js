@@ -1,4 +1,4 @@
-var CACHE = "dh-v1";
+var CACHE = "dh-v2";
 var ASSETS = [
   "/",
   "/index.html",
