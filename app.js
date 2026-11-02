@@ -45,13 +45,16 @@
   function itemPosterHTML(t) {
     const hasPoster = t.poster_path || t.backdrop_path;
     const url = hasPoster ? (t.poster_path || t.backdrop_path) : null;
+    const overlay = '<span class="card-hover"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span>Nonton</span></span>';
     if (url) {
       return `<div class="card-poster" style="background:${posterStyle(t.media_type)}">
         <img class="poster-img" src="${IMG}w342${esc(url)}" alt="${esc(t.title || t.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'">
+        ${overlay}
       </div>`;
     }
     return `<div class="card-poster" style="background:${posterStyle(t.media_type)}">
       <span class="card-poster-title">${esc(t.title || t.name)}</span>
+      ${overlay}
     </div>`;
   }
 
@@ -229,6 +232,40 @@
 
     await renderHome(trend);
     renderNewRow(newMovies, newShows);
+    buildGenreRows([
+      ...trend.results.map((x) => Object.assign({}, x, { media_type: x.media_type || (x.title ? "movie" : "tv") })),
+      ...newMovies, ...newShows,
+    ]);
+  }
+
+  function buildGenreRows(allItems) {
+    const box = $("#genre-rows");
+    if (!box) return;
+    box.innerHTML = "";
+    const counts = {};
+    allItems.forEach((t) => {
+      (t.genre_ids || []).forEach((g) => { if (state.genres[g]) counts[g] = (counts[g] || 0) + 1; });
+    });
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).filter(([, n]) => n >= 4).slice(0, 2);
+    if (!top.length) { box.hidden = true; return; }
+    box.hidden = false;
+    const chev = (dir) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="${dir === "l" ? "15 18 9 12 15 6" : "9 18 15 12 9 6"}"/></svg>`;
+    top.forEach(([gid], i) => {
+      const gname = state.genres[gid] || gid;
+      const items = allItems.filter((t) => (t.genre_ids || []).includes(Number(gid))).slice(0, 10);
+      if (!items.length) return;
+      const sec = document.createElement("section");
+      sec.className = "row";
+      sec.innerHTML =
+        `<div class="row-head"><h2 class="row-title">${esc(gname)}</h2>` +
+        `<div class="carousel-controls"><button type="button" class="ctrl-btn" id="g${i}-prev" aria-label="Geser ke kiri">${chev("l")}</button>` +
+        `<button type="button" class="ctrl-btn" id="g${i}-next" aria-label="Geser ke kanan">${chev("r")}</button></div></div>` +
+        `<div class="carousel" id="g${i}-track"></div><div class="carousel-dots" id="g${i}-dots"></div>`;
+      box.appendChild(sec);
+      const track = sec.querySelector(".carousel");
+      track.innerHTML = items.map(cardHTML).join("");
+      wireCarousel(track, document.getElementById(`g${i}-prev`), document.getElementById(`g${i}-next`), document.getElementById(`g${i}-dots`));
+    });
   }
 
   function renderNewRow(movies, shows) {
@@ -254,9 +291,20 @@
     $("#detail-badge").innerHTML = badgeHTML(media);
     $("#detail-title").textContent = d.title || d.name;
     const year = (d.release_date || d.first_air_date || "").slice(0, 4);
+    const mins = media === "movie" ? d.runtime : (d.episode_run_time || [])[0];
+    let runtimeStr = "";
+    if (mins) {
+      const h = Math.floor(mins / 60), m = mins % 60;
+      runtimeStr = h ? `${h}j ${m}m` : `${m}m`;
+    }
+    const eps = media === "tv" && d.number_of_episodes ? `${d.number_of_episodes} episode` : "";
+    const statusMap = { "Returning Series": "Masih Tayang", "Ended": "Selesai", "Planned": "Rencana", "In Production": "Produksi", "Canceled": "Dibatalkan" };
+    const statusStr = statusMap[d.status] || d.status || "";
+    const ratingStr = d.vote_average ? `${d.vote_average.toFixed(1)}/10` : "";
     const country = (d.production_countries || []).map((c) => c.name).join(", ");
     const cast = (d.credits && d.credits.cast ? d.credits.cast.slice(0, 5) : []).map((c) => c.name).join(", ");
-    $("#detail-meta").innerHTML = `${year} · ${esc(country)} · ${esc(cast)}`;
+    $("#detail-meta").innerHTML = [year, ratingStr, statusStr, runtimeStr, eps, country, cast]
+      .filter(Boolean).map(esc).join(" · ");
     $("#detail-genres").innerHTML = (d.genres || []).map((g) => `<span class="genre-tag">${esc(g.name)}</span>`).join("");
     $("#detail-sinopsis").textContent = d.overview || "";
 
