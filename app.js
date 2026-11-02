@@ -170,22 +170,30 @@
         renderItems(items);
       }
     } catch (e) {
-      $("#grid").innerHTML = '<p class="empty">Gagal memuat: ' + esc(e.message) + "</p>";
+      $("#grid").innerHTML =
+        '<p class="empty">Gagal memuat katalog.</p>' +
+        '<div class="retry-wrap"><button type="button" class="btn btn-ghost btn-sm" id="retry-btn">Coba Lagi</button></div>';
+      const rb = document.getElementById("retry-btn");
+      if (rb) rb.addEventListener("click", () => renderCatalog());
     }
   }
 
   async function initHome() {
     // Fire all initial network requests in parallel for the fastest first paint.
-    let genresTv = {}, genresMv = {}, trend = { results: [] };
+    let genresTv = {}, genresMv = {}, trend = { results: [] }, newMovies = [], newShows = [];
     try {
       const settled = await Promise.allSettled([
         tmdb("/genre/tv/list"),
         tmdb("/genre/movie/list"),
         tmdb("/trending/all/week"),
+        tmdb("/movie/now_playing", { language: "id-ID", region: "ID" }),
+        tmdb("/tv/on_the_air", { language: "id-ID" }),
       ]);
       if (settled[0].status === "fulfilled") genresTv = settled[0].value;
       if (settled[1].status === "fulfilled") genresMv = settled[1].value;
       if (settled[2].status === "fulfilled") trend = settled[2].value;
+      if (settled[3].status === "fulfilled") newMovies = (settled[3].value.results || []);
+      if (settled[4].status === "fulfilled") newShows = (settled[4].value.results || []);
     } catch (e) {}
 
     try {
@@ -220,6 +228,21 @@
     $("#genre-filter").addEventListener("change", (e) => { state.genre = e.target.value; renderCatalog(); });
 
     await renderHome(trend);
+    renderNewRow(newMovies, newShows);
+  }
+
+  function renderNewRow(movies, shows) {
+    const sec = $("#newrow-section");
+    const track = $("#newrow");
+    if (!sec || !track) return;
+    const list = [
+      ...movies.map((x) => Object.assign({}, x, { media_type: "movie" })),
+      ...shows.map((x) => Object.assign({}, x, { media_type: "tv" })),
+    ].slice(0, 10);
+    if (!list.length) { sec.hidden = true; return; }
+    sec.hidden = false;
+    track.innerHTML = list.map(cardHTML).join("");
+    wireCarousel(track, $("#new-prev"), $("#new-next"), $("#new-dots"));
   }
 
   // ---- detail ----
@@ -242,6 +265,11 @@
       $("#detail-poster").innerHTML = `<img class="poster-img detail-poster-img" src="${IMG}w500${esc(d.poster_path)}" alt="${esc(d.title || d.name)}">`;
     } else {
       $("#detail-poster").innerHTML = `<span class="card-poster-title">${esc(d.title || d.name)}</span>`;
+    }
+    const bd = $("#detail-backdrop");
+    if (bd) {
+      const src = d.backdrop_path || d.poster_path;
+      if (src) bd.style.backgroundImage = `url("${IMG}w780${esc(src)}")`;
     }
 
     document.title = (d.title || d.name) + " — DramaHub";

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DramaHub — Streaming Drakor & Dracin</title>
   <meta name="description" content="Streaming-style directory untuk drakor dan dracin. Nonton trailer resmi dan klik ke platform legal.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +49,19 @@
       </div>
       <div class="carousel" id="featured"></div>
       <div class="carousel-dots" id="feat-dots"></div>
+    </section>
+
+    <!-- NEW RELEASES ROW -->
+    <section class="row" id="newrow-section">
+      <div class="row-head">
+        <h2 class="row-title">Baru Rilis</h2>
+        <div class="carousel-controls">
+          <button type="button" class="ctrl-btn" id="new-prev" aria-label="Geser ke kiri"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button type="button" class="ctrl-btn" id="new-next" aria-label="Geser ke kanan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+      <div class="carousel" id="newrow"></div>
+      <div class="carousel-dots" id="new-dots"></div>
     </section>
 
     <!-- CATALOG -->

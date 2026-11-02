@@ -229,11 +229,15 @@ a { color: inherit; }
 .prov-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
 
 .empty { text-align: center; color: var(--muted); padding: 56px 0; }
+.retry-wrap { text-align: center; margin-top: -28px; padding-bottom: 24px; }
 .muted { color: var(--muted); font-size: .85rem; }
 
 /* ---------- detail page ---------- */
 .detail-page { padding-top: 48px; }
-.detail-hero { display: flex; gap: 44px; flex-wrap: wrap; margin-bottom: 32px; }
+.detail-hero { position: relative; overflow: hidden; padding: 48px 0 56px; background: var(--ground); }
+.detail-backdrop { position: absolute; inset: -60px -40px; background-size: cover; background-position: center; filter: blur(28px) saturate(1.15) brightness(.7); }
+.detail-scrim { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.35) 50%, rgba(0,0,0,.78) 100%); /* taste-skill-ignore: scrim over backdrop for readability */ }
+.detail-hero-content { position: relative; z-index: 1; display: flex; gap: 44px; flex-wrap: wrap; align-items: center; }
 .detail-poster {
   position: relative; flex: 0 0 240px; aspect-ratio: 2 / 3;
   border-radius: 14px; overflow: hidden;
@@ -307,7 +311,8 @@ a { color: inherit; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
   .card-body { padding: 12px 12px 4px; }
   .card-meta { padding: 0 12px 12px; }
-  .detail-hero { flex-direction: column; gap: 22px; }
+  .detail-hero { padding: 28px 0 32px; }
+  .detail-hero-content { flex-direction: column; gap: 22px; }
   .detail-poster { flex-basis: auto; width: 100%; max-height: 340px; }
   .row { margin-top: 32px; }
 }
