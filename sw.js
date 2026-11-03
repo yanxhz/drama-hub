@@ -1,4 +1,4 @@
-var CACHE = "dh-v6";
+var CACHE = "dh-v11";
 var ASSETS = [
   "/",
   "/index.html",
@@ -8,6 +8,7 @@ var ASSETS = [
   "/app.js",
   "/player.js",
   "/draviel-logo.png",
+  "/draviel-logo-light.png",
   "/icon-192.png",
   "/icon-512.png",
   "/favicon.svg"

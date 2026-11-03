@@ -30,6 +30,9 @@
   --fs-section: 18px;
   --fs-body: 15px;
   --fs-small: 12px;
+  --tgl-font: 12px;
+  --tgl-socket: #1A1028;
+  --tgl-face: #251A3A;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,6 +52,8 @@ html[data-theme="light"] {
   --primary-bg: #0a0a0a;
   --primary-ink: #ffffff;
   --primary-hover: #1f1f1f;
+  --tgl-socket: #E9E9EE;
+  --tgl-face: #FFFFFF;
 }
 body {
   font-family: var(--font);
@@ -75,7 +80,7 @@ a { color: inherit; }
 .logo { font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
 .logo img { height: 34px; width: auto; display: block; }
 .logo .accent { color: var(--accent); }
-.main-nav { display: flex; gap: 6px; }
+.main-nav { display: flex; gap: 6px; margin-right: auto; }
 .nav-link { color: var(--muted); text-decoration: none; font-size: .9rem; padding: 8px 12px; transition: color .15s; display: inline-flex; align-items: center; }
 .nav-link svg { display: block; }
 .nav-link:hover { color: var(--text); }
@@ -141,13 +146,225 @@ a { color: inherit; }
 .btn-ghost:hover { border-color: var(--text); }
 .btn-sm { padding: 8px 18px; font-size: .85rem; }
 #install-btn[hidden] { display: none !important; }
-.theme-toggle { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 8px; display: inline-flex; align-items: center; transition: color .15s; }
-.theme-toggle:hover { color: var(--text); }
-.theme-toggle svg { display: block; }
-html[data-theme="dark"] .ic-sun { display: block; }
-html[data-theme="dark"] .ic-moon { display: none; }
-html[data-theme="light"] .ic-sun { display: none; }
-html[data-theme="light"] .ic-moon { display: block; }
+/* ---------- theme toggle — moon toggle (jh3y, adapted) ---------- */
+.theme-toggle,
+.toggle {
+  font-size: var(--tgl-font, 12px);
+  height: 3em;
+  aspect-ratio: 1.8 / 1;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 3em;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  --tgl-step: 0.45s;
+  --tgl-ease: linear(0 0%,0.2342 12.49%,0.4374 24.99%,0.6093 37.49%,0.6835 43.74%,0.7499 49.99%,0.8086 56.25%,0.8593 62.5%,0.9023 68.75%,0.9375 75%,0.9648 81.25%,0.9844 87.5%,0.9961 93.75%,1 100%);
+  --tgl-offset: calc(var(--tgl-step) * 0.5);
+}
+.toggle > .socket,
+.toggle > .face {
+  position: absolute;
+  border-radius: 3em;
+}
+.toggle > .socket {
+  inset: 0;
+  background: var(--tgl-socket);
+  box-shadow: -0.05em 0.1em 0.2em -0.2em white;
+  transition: background-color var(--tgl-step) var(--tgl-ease), box-shadow var(--tgl-step) var(--tgl-ease);
+}
+.toggle > .face {
+  inset: 0.15em;
+  scale: 1;
+  transition: scale var(--tgl-step) var(--tgl-ease);
+}
+.toggle:hover { color: var(--text); }
+.toggle .socket-shadow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border-radius: inherit;
+  box-shadow: 0em 0.075em 0.1em 0em white;
+  transition: opacity var(--tgl-step) var(--tgl-ease);
+}
+.toggle .face-shadow,
+.toggle .face-shadow::after,
+.toggle .face-shadow::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.toggle .face-shadow::after,
+.toggle .face-shadow::before {
+  content: '';
+}
+.toggle .face-shadow::before { background: black; }
+.toggle .face-shadow::after { background: white; }
+.toggle .face-shadow::after,
+.toggle .face-shadow::before {
+  transition: opacity var(--tgl-step) var(--tgl-ease), translate var(--tgl-step) var(--tgl-ease), filter var(--tgl-step) var(--tgl-ease), scale var(--tgl-step) var(--tgl-ease);
+}
+.toggle .face-shadow::after { scale: 0.5; }
+.toggle .face-plate {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: -0.05em 0.1em 0.2em -0.2em white inset;
+  background: conic-gradient(from 45deg, #0000, hsl(0 0% 100% / 0.05)), var(--tgl-face);
+  transition: background-color var(--tgl-step) var(--tgl-ease);
+}
+.toggle .face-glowdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  scale: 0;
+  transition: scale var(--tgl-step) var(--tgl-ease);
+}
+.toggle .face-glowdrop::after,
+.toggle .face-glowdrop::before {
+  content: '';
+  height: 50%;
+  aspect-ratio: 1;
+  background: #fff;
+  filter: blur(6px);
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+}
+.toggle .face-glowdrop::before { left: 4%; width: 56%; translate: 0 -25%; }
+.toggle .face-glowdrop::after { bottom: 0; right: 12%; width: 34%; translate: 0 20%; }
+.toggle .face-glows {
+  position: absolute;
+  inset: -0.075em;
+  opacity: 0;
+  border-radius: inherit;
+  mix-blend-mode: plus-lighter;
+  filter: blur(8px);
+  z-index: 20;
+  mask: conic-gradient(from 280deg, #0000, #fff 20deg 45deg, #0000 95deg),
+        conic-gradient(from 110deg, #0000, #fff 20deg, #0000 95deg);
+  transition: opacity var(--tgl-step) var(--tgl-ease);
+}
+.toggle .face-glows div {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  filter: blur(4px);
+  border: 0.1em solid white;
+}
+.toggle .face-shine {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border-radius: 3em;
+  transition: opacity var(--tgl-step) var(--tgl-ease);
+}
+.toggle .face-shine-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  mask: conic-gradient(from 0deg, #fff 90deg, #0000 110deg 200deg, #fff 215deg 280deg, #0000 315deg);
+  box-shadow: 0.075em 0 0.025em -0.025em hsl(0 0% 0% / 0.5) inset,
+              -0.075em -0.05em 0.025em -0.025em hsl(0 0% 0% / 0.5) inset;
+}
+.toggle .face-shine::before {
+  content: '';
+  position: absolute;
+  inset: 0.05em;
+  border-radius: 3em;
+  box-shadow: 0 -0.05em 0.025em -0.025em hsl(0 0% 50% / 0.5) inset,
+              -0.025em 0.05em 0.025em -0.025em hsl(0 0% 100% / 0.5) inset;
+}
+.toggle .face-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 45deg, #0000, hsl(0 0% 100% / 0.25));
+  border-radius: 3em;
+}
+.toggle .face svg {
+  --glow: hsl(182 90% 92%);
+  width: 25%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -52% -48%;
+  overflow: visible !important;
+}
+.toggle .face svg path {
+  transform-box: fill-box;
+  transform-origin: center center;
+}
+.toggle .glow {
+  z-index: 3;
+  filter: drop-shadow(0 0 0.2em var(--glow));
+  will-change: opacity;
+  opacity: 1;
+  transition: opacity var(--tgl-step) var(--tgl-ease);
+}
+.toggle .trail-holder {
+  z-index: 2;
+  filter: blur(10px);
+}
+.toggle .trail-holder .trail { stroke-width: 4; }
+.toggle .trail {
+  stroke-dasharray: 10 80;
+  stroke-dashoffset: 10;
+  opacity: 0;
+  transition-property: stroke-dashoffset, opacity;
+  transition-duration: calc(var(--tgl-step) * 3), calc(var(--tgl-step) * 0.5);
+  transition-delay: var(--tgl-offset), calc(var(--tgl-offset) + (var(--tgl-step) * 2.5));
+  transition-timing-function: var(--tgl-ease),
+    linear(0 0%,0.0039 6.25%,0.0156 12.5%,0.0352 18.75%,0.0625 25%,0.0977 31.25%,0.1407 37.5%,0.1914 43.74%,0.2499 49.99%,0.3164 56.25%,0.3906 62.5%,0.5625 75%,0.7656 87.5%,1 100%);
+}
+.toggle .inner-face { fill: hsl(230 5% 80%); }
+.toggle .glow-path {
+  fill: var(--glow);
+  stroke: var(--glow);
+  opacity: 1;
+  stroke-width: 0px;
+}
+.toggle .outline {
+  transition: stroke var(--tgl-step) var(--tgl-ease);
+}
+.toggle .inner-bg {
+  fill: black;
+  transition: fill var(--tgl-step) var(--tgl-ease);
+}
+.toggle:active > .socket { box-shadow: -0.045em 0.1em 0.2em -0.15em white; }
+.toggle:active > .face { scale: 0.99; }
+.toggle[aria-pressed="true"] > .face { scale: 1.12; }
+.toggle[aria-pressed="true"] .outline { stroke: hsl(0 0% 30%); }
+.toggle[aria-pressed="true"] .inner-bg { fill: hsl(0 0% 20%); }
+.toggle[aria-pressed="true"] > .socket { box-shadow: -0.025em 0.08em 0.2em -0.1em white; }
+.toggle[aria-pressed="true"] .glow { opacity: 0; }
+.toggle[aria-pressed="true"] .face-glowdrop { scale: 1; }
+.toggle[aria-pressed="true"] .face-shadow::before { translate: -15% 55%; filter: blur(1em); opacity: 0.35; }
+.toggle[aria-pressed="true"] .face-shadow::after { filter: blur(0.5em); scale: 1; }
+.toggle[aria-pressed="true"] .socket-shadow,
+.toggle[aria-pressed="true"] .face-glows,
+.toggle[aria-pressed="true"] .face-shine { opacity: 1; }
+.toggle[aria-pressed="true"] .trail {
+  transition: stroke-dashoffset 0s;
+  opacity: 1;
+  stroke-dashoffset: -70;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 .trailer-ext { text-align: center; margin-top: 14px; }
 
 /* ---------- rows ---------- */

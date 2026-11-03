@@ -71,6 +71,16 @@
   const KOREAN = "ko", CHINESE = "zh", JAPANESE = "ja";
   const ANIME_GENRE = "16"; // TMDB Animation genre; + JA language => anime
 
+  // English labels for TMDB genre ids (stable); used instead of localized names.
+  const GENRE_EN = {
+    28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
+    99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
+    27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Science Fiction",
+    10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western",
+    10759: "Action & Adventure", 10762: "Kids", 10763: "News", 10764: "Reality",
+    10765: "Sci-Fi & Fantasy", 10766: "Soap", 10767: "Talk", 10768: "War & Politics"
+  };
+
   function discoverFor(asal, page = 1) {
     const base = asal === "film" ? "/discover/movie" : "/discover/tv";
     const p = { page, sort_by: "popularity.desc", "vote_count.gte": 50 };
@@ -389,7 +399,7 @@
 
     try {
       const g = {};
-      [...(genresTv.genres || []), ...(genresMv.genres || [])].forEach((x) => { g[x.id] = x.name; });
+      [...(genresTv.genres || []), ...(genresMv.genres || [])].forEach((x) => { g[x.id] = GENRE_EN[x.id] || x.name; });
       state.genres = g;
       setGenreFilter();
     } catch (e) {}
@@ -556,7 +566,7 @@
     const cast = (d.credits && d.credits.cast ? d.credits.cast.slice(0, 5) : []).map((c) => c.name).join(", ");
     $("#detail-meta").innerHTML = [year, ratingStr, statusStr, runtimeStr, eps, country, cast]
       .filter(Boolean).map(esc).join(" · ");
-    $("#detail-genres").innerHTML = (d.genres || []).map((g) => `<span class="genre-tag">${esc(g.name)}</span>`).join("");
+    $("#detail-genres").innerHTML = (d.genres || []).map((g) => `<span class="genre-tag">${esc(GENRE_EN[g.id] || g.name)}</span>`).join("");
     $("#detail-sinopsis").textContent = d.overview || "";
 
     $("#detail-poster").style.background = posterStyle(media);
@@ -776,7 +786,7 @@
     } catch (e) {}
 
     state.genres = {};
-    [...(genresTv.genres || []), ...(genresMv.genres || [])].forEach((x) => { state.genres[x.id] = x.name; });
+    [...(genresTv.genres || []), ...(genresMv.genres || [])].forEach((x) => { state.genres[x.id] = GENRE_EN[x.id] || x.name; });
     state.genre = "all";
 
     const chipBox = $("#cari-genres");
@@ -984,7 +994,12 @@
     try {
       mode = localStorage.getItem(KEY) || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     } catch (e) {}
-    const applyTheme = (m) => { document.documentElement.setAttribute("data-theme", m); };
+    const applyTheme = (m) => {
+      document.documentElement.setAttribute("data-theme", m);
+      themeBtn.setAttribute("aria-pressed", m === "light");
+      const logoImg = document.querySelector('a.logo img');
+      if (logoImg) logoImg.src = m === "light" ? "draviel-logo-light.png" : "draviel-logo.png";
+    };
     applyTheme(mode);
     themeBtn.addEventListener("click", () => {
       mode = mode === "dark" ? "light" : "dark";
