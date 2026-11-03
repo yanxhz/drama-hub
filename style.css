@@ -7,19 +7,20 @@
    ============================================================ */
 
 :root {
-  --ground: #000000;
-  --surface: #121212;
-  --raised: #1e1e1e;
-  --border: #2c2c2e;
-  --rule: #1b1b1d;
-  --control: #404040;
-  --text: #f5f5f7;
-  --muted: #a1a1a6;
-  --faint: #86868b;
-  --accent: #0a84ff;            /* fresh Apple system Blue; wordmark/selection/data marks */
-  --primary-bg: #f5f5f7;        /* inverted white pill primary */
-  --primary-ink: #000000;
-  --primary-hover: #ffffff;
+  --ground: #0C0714;
+  --nav: #160D24;
+  --surface: #1A1028;
+  --raised: #251A3A;
+  --border: #4B0082;
+  --rule: #21163A;
+  --control: #4B0082;
+  --text: #ffffff;
+  --muted: #A99BB8;
+  --faint: #877A98;
+  --accent: #A020F0;
+  --primary-bg: #A020F0;
+  --primary-ink: #ffffff;
+  --primary-hover: #B84AFF;
   --radius-card: 12px;
   --radius-control: 999px;
   --gap: 22px;
@@ -35,6 +36,7 @@
 html { scroll-behavior: smooth; }
 html[data-theme="light"] {
   --ground: #f5f5f7;
+  --nav: #ffffff;
   --surface: #ffffff;
   --raised: #eeeeee;
   --border: #e2e2e2;
@@ -65,7 +67,7 @@ a { color: inherit; }
 /* ---------- header (solid black, 1px rule, quiet) ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 50;
-  background: var(--ground);
+  background: var(--nav);
   border-bottom: 1px solid var(--rule);
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
@@ -104,7 +106,7 @@ a { color: inherit; }
 /* Vivid Apple-style color grade over the backdrop (user-requested freshness). */
 .hero-tint {
   position: absolute; inset: 0;
-  background: linear-gradient(120deg, rgba(10,132,255,.55) 0%, rgba(10,132,255,0) 42%, rgba(255,45,85,.42) 76%, rgba(180,88,255,.34) 100%); /* taste-skill-ignore: vivid hero color grade, requested */
+  background: linear-gradient(120deg, rgba(160,32,240,.5) 0%, rgba(160,32,240,0) 42%, rgba(184,74,255,.45) 76%, rgba(75,0,130,.38) 100%); /* taste-skill-ignore: vivid hero color grade, requested */
   opacity: .6;
 }
 .hero-scrim {
@@ -271,7 +273,7 @@ html[data-theme="light"] .ic-moon { display: block; }
 /* ---------- badges / chips (neutral, sentence case) ---------- */
 .badge { font-size: .75rem; font-weight: 500; padding: 3px 10px; border-radius: 999px; background: var(--raised); color: var(--muted); }
 .badge-drakor, .badge-dracin { background: var(--raised); color: var(--muted); }
-.badge-new { background: var(--accent); color: #000; }
+.badge-new { background: var(--accent); color: #fff; }
 .card-year { color: var(--muted); font-size: .85rem; }
 .card-rating { color: var(--muted); font-size: .85rem; }
 

@@ -68,20 +68,22 @@
     return r.json();
   }
 
-  const KOREAN = "ko", CHINESE = "zh";
+  const KOREAN = "ko", CHINESE = "zh", JAPANESE = "ja";
+  const ANIME_GENRE = "16"; // TMDB Animation genre; + JA language => anime
 
   function discoverFor(asal, page = 1) {
     const base = asal === "film" ? "/discover/movie" : "/discover/tv";
     const p = { page, sort_by: "popularity.desc", "vote_count.gte": 50 };
     if (asal === "drakor") p["with_original_language"] = KOREAN;
     if (asal === "dracin") p["with_original_language"] = CHINESE;
+    if (asal === "anime") { p["with_original_language"] = JAPANESE; p["with_genres"] = ANIME_GENRE; }
     if (asal === "all") return "/trending/all/week";
     return { base, p };
   }
 
   // ---- rendering ----
   function posterStyle(media) {
-    return media === "movie" ? "#1d1b20" : "#1a1b20";
+    return "#1A1028";
   }
 
   function itemPosterHTML(t) {
@@ -322,25 +324,27 @@
   }
 
   async function renderCatalog(reset = true) {
-    if (reset) state.page = 1;
-    $("#grid").innerHTML = skeletonHTML(12);
+    if (reset) { state.page = 1; $("#grid").innerHTML = skeletonHTML(12); }
+    const page = reset ? 1 : state.page + 1;
     try {
       let items = [], total = 1;
       if (state.query) {
-        const q = await tmdb("/search/multi", { query: state.query, page: state.page });
+        const q = await tmdb("/search/multi", { query: state.query, page });
         items = (q.results || []).filter((x) => x.media_type === "movie" || x.media_type === "tv");
         total = q.total_pages || 1;
       } else {
         const d = discoverFor(state.asal);
         const data = d.base
-          ? await tmdb(d.base, Object.assign({}, d.p, { page: state.page }))
-          : await tmdb(d, { page: state.page });
+          ? await tmdb(d.base, Object.assign({}, d.p, { page }))
+          : await tmdb(d, { page });
         items = (data.results || []).map((x) => Object.assign(x, { media_type: x.media_type || (state.asal === "film" ? "movie" : "tv") }));
         total = data.total_pages || 1;
       }
       if (reset) {
+        state.page = 1;
         state.rawItems = items;
       } else {
+        state.page = page;
         const seen = new Set(state.rawItems.map((x) => x.id + ":" + x.media_type));
         state.rawItems = state.rawItems.concat(items.filter((x) => !seen.has(x.id + ":" + x.media_type)));
       }
@@ -348,6 +352,11 @@
       renderItems(state.rawItems);
       showLoadMore();
     } catch (e) {
+      if (!reset && state.rawItems && state.rawItems.length) {
+        showToast("Gagal memuat halaman berikutnya. Coba lagi.");
+        showLoadMore();
+        return;
+      }
       $("#grid").innerHTML =
         '<p class="empty">Gagal memuat katalog.</p>' +
         '<div class="retry-wrap"><button type="button" class="btn btn-ghost btn-sm" id="retry-btn">Coba Lagi</button></div>';
@@ -420,7 +429,7 @@
     // Load more
     const lm = $("#load-more");
     if (lm) {
-      lm.addEventListener("click", () => { state.page += 1; renderCatalog(false); });
+      lm.addEventListener("click", () => renderCatalog(false));
     }
 
     await renderHome(trend);
